@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
+import django_heroku
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,8 +26,8 @@ SECRET_KEY = 'django-insecure-@=5*sn^s%9*3@)0jre$c!o6c3d_rrb227+zs022rj3x@acugn2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com']
 
 # Application definition
 
@@ -75,21 +76,35 @@ WSGI_APPLICATION = 'SamparkSetu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'TestSamparkSetu',
+
+#         'USER': 'postgres',
+
+#         'PASSWORD': '1234',
+
+#         'HOST': 'localhost',
+
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'TestSamparkSetu',
+        'NAME': 'd63fk4spg2t51q',
 
-        'USER': 'postgres',
+        'USER': 'snfagitiajhaji',
 
-        'PASSWORD': '1234',
+        'PASSWORD': '084084fac263eb7757a38c90dd965707205524ee002338abee8140daa803aba8',
 
-        'HOST': 'localhost',
+        'HOST': 'ec2-184-73-243-101.compute-1.amazonaws.com',
 
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -114,7 +129,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
+STATIC_URL = '/static/'
+django_heroku.settings(locals())
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
