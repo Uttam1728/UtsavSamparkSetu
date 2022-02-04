@@ -1,8 +1,13 @@
+from urllib import request
 from django.contrib import admin
+
+from django import forms
+from django.contrib.admin.helpers import ActionForm
 from Common.util import is_member
+from Mandal.models import Karyakram
 
 from Yuvak.models import YuvakProfile
-
+from FolloWUp.models import HowMethods
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.models import User
 # Register your models here.
@@ -49,6 +54,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         else:
             self.list_filter = []
         return super(YuvakProfileAdmin, self).changelist_view(request, extra_context=None)
+
 
     def Role(self,obj):
         group_names = []
