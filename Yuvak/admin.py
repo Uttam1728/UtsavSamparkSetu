@@ -1,16 +1,35 @@
-from urllib import request
+
+from pyexpat import model
 from django.contrib import admin
 
-from django import forms
-from django.contrib.admin.helpers import ActionForm
-from Common.util import getLatestKarykram, is_member, messageIcons
-from Mandal.models import Karyakram
+from Common.util import  is_member, messageIcons
 
 from django.utils.html import format_html
-from Yuvak.models import YuvakProfile
-from FolloWUp.models import HowMethods
+from Yuvak.models import SatsangProfile, YuvakProfile
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
+
+# method for updating
+@receiver(post_save, sender=YuvakProfile)
+def Create_SatsangiProfile(sender, instance, **kwargs):
+    if not SatsangProfile.objects.filter(yuvakProfile=instance).exists():
+        s = SatsangProfile(yuvakProfile=instance)
+        s.save()
+    username = instance.FirstName.lower() + str(instance.pk).zfill(3)
+    email = username + '@' + username + '.com'
+    if not User.objects.filter(username=username):
+        user = User.objects.create_user(username=username,
+                                    email=email,
+                                    password='1234', is_staff=True)
+        
+        group = Group.objects.get(name='Yuvak')
+        user.groups.add(group)   
+        YuvakProfile.objects.filter(pk=instance.pk).update(user=user)
+
 # Register your models here.
 
 
@@ -26,11 +45,9 @@ class RoleFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         groupName = self.value()
-        print(groupName, "GroupName")
         if groupName is None:
             return queryset
         return queryset.filter(user__groups__name = groupName)
-
 
 class YuvakProfileAdmin(admin.ModelAdmin):
     
@@ -64,7 +81,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
             # self.list_display+= ("Groups",)
             return qs
         elif is_member(request.user,"Yuvak"):
-            return qs.filter(user=request.user)
+            return qs.filter(pk=request.user.yuvakprofile.pk)
         elif is_member(request.user,"Sampark Karykar"):
             return YuvakProfile.objects.filter(karyakarprofile__user = request.user)
 
@@ -72,18 +89,24 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         user = request.user
         if user.is_superuser:
             self.list_filter = [RoleFilter]
-            self.list_display += ("Role",)
+            if "Role" not in self.list_display:
+                 self.list_display += ("Role",)
         else:
             self.list_filter = []
         return super(YuvakProfileAdmin, self).changelist_view(request, extra_context=None)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        if not request.user.is_superuser:
+            self.readonly_fields = ["user","mandal"]
+        else:
+            self.readonly_fields = []
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def Role(self,obj):
         group_names = []
         for g in obj.user.groups.all():
             group_names.append(g.name)
         return ",".join(group_names)
-
-        
 
 class UserAdmin(AuthUserAdmin):
     
@@ -112,12 +135,22 @@ class UserAdmin(AuthUserAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if not request.user.is_superuser:
-            self.fieldsets = ((None, {"fields": ("username","password")}),)
+            self.fieldsets = ((None, {"fields": ("username","password","email")}),)
         return super(UserAdmin, self).change_view(request, object_id, extra_context)
-            
+
+class SatsangProfileAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        qs = super(SatsangProfileAdmin, self).get_queryset(request) 
+        if request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(yuvakProfile=request.user.yuvakprofile) 
+    
+    pass
+
 
 
 admin.site.unregister(User)
 admin.site.register(User,UserAdmin)
 admin.site.register(YuvakProfile, YuvakProfileAdmin)
-
+admin.site.register(SatsangProfile,SatsangProfileAdmin)

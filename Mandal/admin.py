@@ -68,7 +68,7 @@ class KaryakramAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if "_followup_record_create" in request.POST:
             if obj.pk:
-                print(obj)
+                # print(obj)
                 for karyakar in obj.Mandal.karyakarprofile_set.all():
                     for yuvak in karyakar.Yuvaks.all():
                         if not FollowUp.objects.filter(Karyakram=obj,

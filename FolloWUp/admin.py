@@ -8,9 +8,9 @@ from django import forms
 from django.utils.html import format_html
 # Register your models here.
 
-color= {FollowupStatus.Pending: ("yellow","Pending"),
-FollowupStatus.Done:("green","Done"),
-FollowupStatus.No:("red","No")}
+color= {FollowupStatus.Pending: ("lightgoldenrodyellow","Pending"),
+FollowupStatus.Done:("darkseagreen","Done"),
+FollowupStatus.No:("indianred","No")}
 
 class FollowUpAdmin(admin.ModelAdmin):
     list_display = ("__str__", "StatusWithColor", "YuvakName", "How",)
@@ -43,7 +43,8 @@ class FollowUpAdmin(admin.ModelAdmin):
         return obj.Yuvak.FirstName + " " + obj.Yuvak.SurName
     
     def StatusWithColor(self,obj):
-        return format_html('<p style="color:{}">{}</p>'.format(color[obj.Status][0],color[obj.Status][1]))
+        
+        return format_html("<button style='color: black;border-radius: 5px;border: none;background: {};'>{}</button>".format(color[obj.Status][0],color[obj.Status][1]))
     
     def get_queryset(self, request):
         qs = super(FollowUpAdmin, self).get_queryset(request) 
