@@ -33,9 +33,10 @@ class FollowUpAdmin(admin.ModelAdmin):
         :param queryset: the list of items selected by the user
         :return:
         """
-        new_status = request.POST.get('new_status')
-        how = request.POST.get('How')
-        queryset.update(Status=int(new_status),How=int(how))
+        if request.user.is_superuser:
+            new_status = request.POST.get('new_status')
+            how = request.POST.get('How')
+            queryset.update(Status=int(new_status),How=int(how))
 
     change_status.allowed_permissions = ('change',)
     change_status.short_description = "Mark selected Yuvak as..."
@@ -54,7 +55,7 @@ class FollowUpAdmin(admin.ModelAdmin):
         # elif is_member(request.user,"Yuvak"):
         #     return qs.filter(user=request.user)
         elif is_member(request.user,"Sampark Karykar"):
-            return qs.filter(SamparkKarykar__user = request.user)
+            return qs.filter(SamparkKarykar__profile__user = request.user)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if is_member(request.user,"Sampark Karykar"):

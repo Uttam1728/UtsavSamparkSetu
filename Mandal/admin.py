@@ -95,12 +95,13 @@ class MandalProfileAdmin(admin.ModelAdmin):
     list_display = ("__str__", "Nirikshak_details", "Sanchalak_details",)
     
     def Nirikshak_details(self,obj):
-        return format_html(obj.Nirikshak.FirstName + " " +obj.Nirikshak.SurName +" : "+ messageIcons(obj.Nirikshak.WhatsappNo,20))
-    
+        if obj.Nirikshak : 
+            return format_html(obj.Nirikshak.FirstName + " " +obj.Nirikshak.SurName +" : "+ messageIcons(obj.Nirikshak.WhatsappNo,20))
+        return ''
     def Sanchalak_details(self,obj):
-        # msg = 
-        # msg += 
-        return format_html(obj.Sanchalak.FirstName + " " +obj.Sanchalak.SurName +" : " + messageIcons(obj.Nirikshak.WhatsappNo,20))
-    
+        if obj.Sanchalak:
+            return format_html(obj.Sanchalak.FirstName + " " +obj.Sanchalak.SurName +" : " + messageIcons(obj.Nirikshak.WhatsappNo,20))
+        return ''
+        
 admin.site.register(MandalProfile,MandalProfileAdmin)
 admin.site.register(Karyakram,KaryakramAdmin)

@@ -1,5 +1,5 @@
 
-from pyexpat import model
+
 from django.contrib import admin
 
 from Common.util import  is_member, messageIcons
@@ -13,6 +13,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 
+from django.utils.translation import gettext as _
 # method for updating
 @receiver(post_save, sender=YuvakProfile)
 def Create_SatsangiProfile(sender, instance, **kwargs):
@@ -80,11 +81,11 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             # self.list_display+= ("Groups",)
             return qs
+        elif is_member(request.user,"Sampark Karykar"):
+            return YuvakProfile.objects.filter(karyakarprofile__profile__user = request.user)
         elif is_member(request.user,"Yuvak"):
             return qs.filter(pk=request.user.yuvakprofile.pk)
-        elif is_member(request.user,"Sampark Karykar"):
-            return YuvakProfile.objects.filter(karyakarprofile__user = request.user)
-
+        
     def changelist_view(self, request, extra_context=None):
         user = request.user
         if user.is_superuser:
@@ -128,7 +129,7 @@ class UserAdmin(AuthUserAdmin):
         user = request.user
         if not user.is_superuser:
             self.list_filter = []
-            self.list_display = ['__str__']
+            self.list_display = ['__str__','email','password']
             self.search_fields = []
             
         return super(UserAdmin, self).changelist_view(request, extra_context=None)
@@ -136,6 +137,7 @@ class UserAdmin(AuthUserAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if not request.user.is_superuser:
             self.fieldsets = ((None, {"fields": ("username","password","email")}),)
+        
         return super(UserAdmin, self).change_view(request, object_id, extra_context)
 
 class SatsangProfileAdmin(admin.ModelAdmin):
@@ -146,7 +148,13 @@ class SatsangProfileAdmin(admin.ModelAdmin):
         else:
             return qs.filter(yuvakProfile=request.user.yuvakprofile) 
     
-    pass
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        if not request.user.is_superuser:
+            self.readonly_fields = ["yuvakProfile"]
+        else:
+            self.readonly_fields = []
+        return super().change_view(request, object_id, form_url, extra_context)
+
 
 
 

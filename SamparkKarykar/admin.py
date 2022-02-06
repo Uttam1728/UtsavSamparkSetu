@@ -34,11 +34,11 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
         qs = super(KaryakarProfileAdmin, self).get_queryset(request) 
         if request.user.is_superuser:
             return qs
+        elif is_member(request.user,"Sampark Karykar"):
+            return qs.filter(profile=request.user.yuvakprofile)
         elif is_member(request.user,"Yuvak"):
-            return request.user.yuvakprofile_set.all()[0].karyakarprofile_set
-        else:
-            return qs.filter(user=request.user)
-
+            return request.user.yuvakprofile.karyakarprofile_set
+        
     def Whatsapp_no(self,obj):
         return obj.profile.WhatsappNo
 
