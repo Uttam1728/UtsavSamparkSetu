@@ -3,7 +3,7 @@ from django.contrib import admin
 
 from django import forms
 from django.contrib.admin.helpers import ActionForm
-from Common.util import getLatestKarykram, is_member
+from Common.util import getLatestKarykram, is_member, messageIcons
 from Mandal.models import Karyakram
 
 from django.utils.html import format_html
@@ -55,13 +55,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     
     
     def MessageIcons(self,obj):
-        buttons = ''
-        buttons += "<a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(obj.WhatsappNo)
-        buttons += "&nbsp; <a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;margin-left:5px'></i> </a>".format(obj.WhatsappNo)
-        buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;margin-left:5px'></i> </a>".format(obj.WhatsappNo)  
-        # buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-send-o' style='font-size:27px;color:deepskyblue;margin-left:5px'></i> </a>".format(obj.WhatsappNo)
-        return format_html(buttons)
-        # <img src='/Photos/whatsapp-logo.png' alt='Whatsapp' width='25'📲 height='25'>
+        return format_html(messageIcons(obj.WhatsappNo,27))
     MessageIcons.short_description = 'Connect'
 
     def get_queryset(self, request):

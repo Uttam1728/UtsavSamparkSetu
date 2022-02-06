@@ -1,6 +1,6 @@
 from urllib import request
 from django.contrib import admin
-from Common.util import is_member,is_followUpDone
+from Common.util import is_member,is_followUpDone, messageIcons
 
 from django.utils.translation import gettext as _
 from django.contrib import messages
@@ -89,6 +89,18 @@ class KaryakramAdmin(admin.ModelAdmin):
         else:
             return super().save_model(request, obj, form, change)
 
+class MandalProfileAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/mandal_change_list.html'
 
-admin.site.register(MandalProfile)
+    list_display = ("__str__", "Nirikshak_details", "Sanchalak_details",)
+    
+    def Nirikshak_details(self,obj):
+        return format_html(obj.Nirikshak.FirstName + " " +obj.Nirikshak.SurName +" : "+ messageIcons(obj.Nirikshak.WhatsappNo,20))
+    
+    def Sanchalak_details(self,obj):
+        # msg = 
+        # msg += 
+        return format_html(obj.Sanchalak.FirstName + " " +obj.Sanchalak.SurName +" : " + messageIcons(obj.Nirikshak.WhatsappNo,20))
+    
+admin.site.register(MandalProfile,MandalProfileAdmin)
 admin.site.register(Karyakram,KaryakramAdmin)
