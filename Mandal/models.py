@@ -17,7 +17,8 @@ class Karyakram(models.Model):
     is_active = models.BooleanField(default=False)
     Start_date = models.DateTimeField(blank=True,null=True)
     End_date = models.DateTimeField(blank=True,null=True)
-    Mandal = models.OneToOneField(MandalProfile,blank=True,null=True,on_delete=models.CASCADE)
+    Karyakram_date=models.DateTimeField(blank=True,null=True)
+    Mandal = models.ForeignKey(MandalProfile,blank=True,null=True,on_delete=models.CASCADE)
     For_All = models.BooleanField(default=False)
     
     def __str__(self):

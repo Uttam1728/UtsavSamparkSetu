@@ -3,9 +3,10 @@ from django.contrib import admin
 
 from django import forms
 from django.contrib.admin.helpers import ActionForm
-from Common.util import is_member
+from Common.util import getLatestKarykram, is_member
 from Mandal.models import Karyakram
 
+from django.utils.html import format_html
 from Yuvak.models import YuvakProfile
 from FolloWUp.models import HowMethods
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
@@ -30,12 +31,38 @@ class RoleFilter(admin.SimpleListFilter):
             return queryset
         return queryset.filter(user__groups__name = groupName)
 
-        # if groupName == 'Yuvak':
-        #     return queryset.filter(Q(message__isnull=True) | Q(message__exact=''))
-
 
 class YuvakProfileAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "WhatsappNo","user","Role")
+    
+    change_list_template = 'admin/yuvak_change_list.html'
+    
+    list_display = ("__str__", "WhatsApp","Call","SMS","user")
+
+    def WhatsApp(self,obj):
+        buttons = ''
+        buttons += "<a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(obj.WhatsappNo)
+        return format_html(buttons)
+
+    def Call(self,obj):
+        buttons = ''
+        buttons += "<a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;'></i> </a>".format(obj.WhatsappNo)
+        return format_html(buttons)
+    
+    def SMS(self,obj):
+        buttons = ''
+        buttons += "<a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;'></i> </a>".format(obj.WhatsappNo)  
+        return format_html(buttons)
+    
+    
+    def MessageIcons(self,obj):
+        buttons = ''
+        buttons += "<a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(obj.WhatsappNo)
+        buttons += "&nbsp; <a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;margin-left:5px'></i> </a>".format(obj.WhatsappNo)
+        buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;margin-left:5px'></i> </a>".format(obj.WhatsappNo)  
+        # buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-send-o' style='font-size:27px;color:deepskyblue;margin-left:5px'></i> </a>".format(obj.WhatsappNo)
+        return format_html(buttons)
+        # <img src='/Photos/whatsapp-logo.png' alt='Whatsapp' width='25'📲 height='25'>
+    MessageIcons.short_description = 'Connect'
 
     def get_queryset(self, request):
         qs = super(YuvakProfileAdmin, self).get_queryset(request) 
@@ -51,10 +78,10 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         user = request.user
         if user.is_superuser:
             self.list_filter = [RoleFilter]
+            self.list_display += ("Role",)
         else:
             self.list_filter = []
         return super(YuvakProfileAdmin, self).changelist_view(request, extra_context=None)
-
 
     def Role(self,obj):
         group_names = []
@@ -66,6 +93,12 @@ class YuvakProfileAdmin(admin.ModelAdmin):
 
 class UserAdmin(AuthUserAdmin):
     
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_add_permission(self, request, obj=None):
+        return request.user.is_superuser
+
     def get_queryset(self, request):
         qs = super(UserAdmin, self).get_queryset(request) 
         if request.user.is_superuser:
@@ -73,6 +106,20 @@ class UserAdmin(AuthUserAdmin):
         else:
             self.list_filter = []
             return qs.filter(pk=request.user.id) 
+    
+    def changelist_view(self, request, extra_context=None):
+        user = request.user
+        if not user.is_superuser:
+            self.list_filter = []
+            self.list_display = ['__str__']
+            self.search_fields = []
+            
+        return super(UserAdmin, self).changelist_view(request, extra_context=None)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        if not request.user.is_superuser:
+            self.fieldsets = ((None, {"fields": ("username","password")}),)
+        return super(UserAdmin, self).change_view(request, object_id, extra_context)
             
 
 

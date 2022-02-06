@@ -16,5 +16,5 @@ class YuvakProfile(models.Model):
     mandal = models.ForeignKey(MandalProfile,on_delete=models.CASCADE,blank=True,null=True)
 
     def __str__(self):
-        return self.FirstName + " " + self.MiddleName + " " + self.SurName
+        return self.mandal.__str__() + ": "+ self.FirstName + " " + self.MiddleName + " " + self.SurName
 

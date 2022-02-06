@@ -1,0 +1,9 @@
+{% extends 'admin/change_form.html' %}
+{% load static %}
+
+{% block submit_buttons_bottom %}
+    {{ block.super }}
+    <div class="submit-row">
+            <input type="submit" value="Initiate FollowUp" name="_followup_record_create">
+    </div>
+{% endblock %}

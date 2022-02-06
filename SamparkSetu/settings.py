@@ -25,9 +25,10 @@ SECRET_KEY = 'django-insecure-@=5*sn^s%9*3@)0jre$c!o6c3d_rrb227+zs022rj3x@acugn2
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+MEDIA_URL = '/Photos/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "Photos")
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com']
+ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com','drive.google.com']
 
 # Application definition
 
@@ -59,7 +60,7 @@ ROOT_URLCONF = 'SamparkSetu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,35 +79,35 @@ WSGI_APPLICATION = 'SamparkSetu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'TestSamparkSetu',
-
-        'USER': 'postgres',
-
-        'PASSWORD': '1234',
-
-        'HOST': 'localhost',
-
-        'PORT': '5432',
-    }
-}
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'd63fk4spg2t51q',
+#         'NAME': 'TestSamparkSetu',
 
-#         'USER': 'snfagitiajhaji',
+#         'USER': 'postgres',
 
-#         'PASSWORD': '084084fac263eb7757a38c90dd965707205524ee002338abee8140daa803aba8',
+#         'PASSWORD': '1234',
 
-#         'HOST': 'ec2-184-73-243-101.compute-1.amazonaws.com',
+#         'HOST': 'localhost',
 
 #         'PORT': '5432',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd63fk4spg2t51q',
+
+        'USER': 'snfagitiajhaji',
+
+        'PASSWORD': '084084fac263eb7757a38c90dd965707205524ee002338abee8140daa803aba8',
+
+        'HOST': 'ec2-184-73-243-101.compute-1.amazonaws.com',
+
+        'PORT': '5432',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

@@ -14,6 +14,12 @@ class HowMethods(IntEnum) :
     InPerson = 5,
     Other = 6 
 
+class FollowupStatus(IntEnum) :
+    Pending = 1,
+    Done = 2,
+    No = 3,
+    InProgress = 4
+
 
 # Create your models here.
 class FollowUp(models.Model):
@@ -27,3 +33,10 @@ class FollowUp(models.Model):
                 choices=[(methods.value, methods.name) for methods in HowMethods]  # Choices is a list of Tuple
              )
     Remark = models.CharField(max_length=1000,blank=True,null=True)
+    Status = models.IntegerField(
+                default=FollowupStatus.Pending,
+                choices=[(status.value, status.name) for status in FollowupStatus]  # Choices is a list of Tuple
+             )
+
+    def __str__(self):
+        return self.Karyakram.__str__()
