@@ -70,7 +70,8 @@ class FollowUpAdmin(admin.ModelAdmin):
         if user.is_superuser:
             self.list_filter.insert(1,KarykarDropdownFilter)
         elif is_member(request.user,"Sampark Karykar"):
-             self.list_filter.remove(KarykarDropdownFilter)
+             if KarykarDropdownFilter in self.list_filter : 
+                self.list_filter.remove(KarykarDropdownFilter)
         return super(FollowUpAdmin, self).changelist_view(request, extra_context=None)
 
 admin.site.register(FollowUp,FollowUpAdmin)
