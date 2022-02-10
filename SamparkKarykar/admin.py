@@ -1,9 +1,26 @@
 from django.contrib import admin
+
 from Common.util import getMandal, is_member
 
 from SamparkKarykar.models import KaryakarProfile
 
 from django.utils.html import format_html
+from django.contrib import admin
+
+
+from django.utils.html import format_html
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import Group
+
+from django.utils.translation import gettext as _
+
+@receiver(post_save, sender=KaryakarProfile)
+def Add_KaryKarGroup(sender, instance, **kwargs):
+    if instance.user is None:
+        user = instance.profile.user
+        group = Group.objects.get(name='Sampark Karykar')
+        user.groups.add(group)   
 
 
 class KaryakarProfileAdmin(admin.ModelAdmin):

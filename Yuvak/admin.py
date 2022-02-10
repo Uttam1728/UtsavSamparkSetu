@@ -27,7 +27,6 @@ def Create_SatsangiProfile(sender, instance, **kwargs):
         
         group = Group.objects.get(name='Yuvak')
         user.groups.add(group)   
-        instance.force_pswd_first_login = True
         YuvakProfile.objects.filter(pk=instance.pk).update(user=user)
 
 # Register your models here.
