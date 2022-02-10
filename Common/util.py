@@ -30,3 +30,18 @@ def messageIcons(phoneNo,size=27):
     # <img src='/Photos/whatsapp-logo.png' alt='Whatsapp' width='25'📲 height='25'>
 
     return buttons
+
+def Profile_Completion(obj):
+        fields_names = [f.name for f in obj._meta.fields]
+        completed = 0
+        for field_name in fields_names:
+            value = getattr(obj, field_name)
+            completed += not(value is None or value == '')
+        ratio = (completed / len(fields_names)) * 100
+        
+        return  ratio
+        
+
+def getMandal(user):
+    return user.yuvakprofile.mandal
+        

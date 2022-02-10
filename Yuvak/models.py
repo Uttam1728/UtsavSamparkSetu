@@ -21,45 +21,46 @@ class YuvakProfile(models.Model):
     SurName = models.CharField(max_length=50)
     WhatsappNo = models.CharField(max_length=10, db_index=True)
     HomePhoneNo = models.CharField(max_length=10, null=True, blank=True)
-    HouseNo = models.IntegerField(verbose_name="House/Flat No.")
-    Soc_Name = models.CharField(max_length=50,verbose_name="Sociaty/Apartment Name")
-    LandMark = models.CharField(max_length=100)
-    Area = models.CharField(max_length=50)
+    HouseNo = models.IntegerField(verbose_name="House/Flat No.", null=True, blank=True)
+    Soc_Name = models.CharField(max_length=50,verbose_name="Sociaty/Apartment Name", null=True, blank=True)
+    LandMark = models.CharField(max_length=100, null=True, blank=True)
+    Area = models.CharField(max_length=50, null=True, blank=True)
     PinCode = models.CharField(max_length=6, null=True, blank=True)
-    Married = models.BooleanField(default=False)
+    Married = models.BooleanField(blank=True,null=True)
     DateOfBirth = models.DateField(blank=True,null=True)
     Education = models.CharField(max_length=100,blank=True,null=True)
     user = models.OneToOneField(User,on_delete=models.CASCADE,null=True, blank=True,)
     mandal = models.ForeignKey(MandalProfile,on_delete=models.CASCADE,blank=True,null=True)
-
     def __str__(self):
-        return self.mandal.__str__() + ": "+ self.FirstName + " " + self.MiddleName + " " + self.SurName
+        return self.FirstName + " " + self.MiddleName + " " + self.SurName
 
 class SatsangProfile(models.Model):
     yuvakProfile = models.OneToOneField(YuvakProfile,on_delete=models.CASCADE)
-    NityaPuja = models.BooleanField(default=False)
-    NityaPujaYear = models.IntegerField(validators=[MaxValueValidator(30)],default=0)
-    TilakChandlo = models.BooleanField(default=False)
-    TilakChandloYear = models.IntegerField(validators=[MaxValueValidator(30)],default=0)
-    Satsangi = models.BooleanField(default=False)
-    SatsangiYear = models.IntegerField(validators=[MaxValueValidator(30)],default=0)
-    AthvadikSabha = models.BooleanField(default=False)
-    AthvadikSabhaYear = models.IntegerField(validators=[MaxValueValidator(30)],default=0)
-    Ravisabha = models.BooleanField(default=False)
-    RavisabhaYear = models.IntegerField(validators=[MaxValueValidator(30)],default=0)
-    GharSatsang = models.BooleanField(default=False)
-    GharSatsangYear = models.IntegerField(validators=[MaxValueValidator(30)],default=0)
-    SSP = models.BooleanField(default=False)
-    SSPStage = models.IntegerField(
+    NityaPuja = models.BooleanField(blank=True,null=True)
+    NityaPujaYear = models.IntegerField(validators=[MaxValueValidator(30)],blank=True,null=True)
+    TilakChandlo = models.BooleanField(blank=True,null=True)
+    TilakChandloYear = models.IntegerField(validators=[MaxValueValidator(30)],blank=True,null=True)
+    Satsangi = models.BooleanField(blank=True,null=True)
+    SatsangiYear = models.IntegerField(validators=[MaxValueValidator(30)],blank=True,null=True)
+    AthvadikSabha = models.BooleanField(blank=True,null=True)
+    AthvadikSabhaYear = models.IntegerField(validators=[MaxValueValidator(30)],blank=True,null=True)
+    Ravisabha = models.BooleanField(blank=True,null=True)
+    RavisabhaYear = models.IntegerField(validators=[MaxValueValidator(30)],blank=True,null=True)
+    GharSatsang = models.BooleanField(blank=True,null=True)
+    GharSatsangYear = models.IntegerField(validators=[MaxValueValidator(30)],blank=True,null=True)
+    SSP = models.BooleanField(blank=True,null=True)
+    SSPStage = models.IntegerField( 
                 default=SSPStage.No,
                 choices=[(methods.value, methods.name) for methods in SSPStage]  # Choices is a list of Tuple
              )
-    Ekadashi = models.BooleanField(default=False)
-    EkadashiYear = models.IntegerField(validators=[MaxValueValidator(30)],default=0)
-    Niymit_Vanchan = models.BooleanField(default=False)
-    Niymit_VanchanYear = models.IntegerField(validators=[MaxValueValidator(30)],default=0)
+    Ekadashi = models.BooleanField(blank=True,null=True)
+    EkadashiYear = models.IntegerField(validators=[MaxValueValidator(30)],blank=True,null=True)
+    Niymit_Vanchan = models.BooleanField(blank=True,null=True)
+    Niymit_VanchanYear = models.IntegerField(validators=[MaxValueValidator(30)],blank=True,null=True)
     
 
 
     def __str__(self):
         return self.yuvakProfile.__str__()
+
+

@@ -1,8 +1,6 @@
-
-
 from django.contrib import admin
 
-from Common.util import  is_member, messageIcons
+from Common.util import  Profile_Completion, getMandal, is_member, messageIcons
 
 from django.utils.html import format_html
 from Yuvak.models import SatsangProfile, YuvakProfile
@@ -22,13 +20,14 @@ def Create_SatsangiProfile(sender, instance, **kwargs):
         s.save()
     username = instance.FirstName.lower() + str(instance.pk).zfill(3)
     email = username + '@' + username + '.com'
-    if not User.objects.filter(username=username):
+    if instance.user is None:
         user = User.objects.create_user(username=username,
                                     email=email,
                                     password='1234', is_staff=True)
         
         group = Group.objects.get(name='Yuvak')
         user.groups.add(group)   
+        instance.force_pswd_first_login = True
         YuvakProfile.objects.filter(pk=instance.pk).update(user=user)
 
 # Register your models here.
@@ -54,7 +53,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     
     change_list_template = 'admin/yuvak_change_list.html'
     
-    list_display = ("__str__", "WhatsApp","Call","SMS","user")
+    list_display = ("__str__", "Profile_Completion", "WhatsApp","Call","SMS","user")
 
     def WhatsApp(self,obj):
         buttons = ''
@@ -71,7 +70,15 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         buttons += "<a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;'></i> </a>".format(obj.WhatsappNo)  
         return format_html(buttons)
     
-    
+    def Profile_Completion(self,obj):
+        return format_html(
+            '''
+            <progress value="{0}" max="100"></progress>
+            <span style="font-weight:bold">{0}%</span>
+            ''',
+            Profile_Completion(obj)
+        )
+
     def MessageIcons(self,obj):
         return format_html(messageIcons(obj.WhatsappNo,27))
     MessageIcons.short_description = 'Connect'
@@ -79,8 +86,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(YuvakProfileAdmin, self).get_queryset(request) 
         if request.user.is_superuser:
-            # self.list_display+= ("Groups",)
-            return qs
+            return qs.filter(mandal=getMandal(request.user))
         elif is_member(request.user,"Sampark Karykar"):
             return YuvakProfile.objects.filter(karyakarprofile__profile__user = request.user)
         elif is_member(request.user,"Yuvak"):
@@ -120,7 +126,7 @@ class UserAdmin(AuthUserAdmin):
     def get_queryset(self, request):
         qs = super(UserAdmin, self).get_queryset(request) 
         if request.user.is_superuser:
-            return qs
+            return qs.filter(yuvakprofile__mandal=getMandal(request.user))
         else:
             self.list_filter = []
             return qs.filter(pk=request.user.id) 
@@ -141,10 +147,31 @@ class UserAdmin(AuthUserAdmin):
         return super(UserAdmin, self).change_view(request, object_id, extra_context)
 
 class SatsangProfileAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "Profile_Completion",)
+    fieldsets = ((None, {"fields": (("NityaPuja","NityaPujaYear"),
+    ("TilakChandlo","TilakChandloYear"),
+    ("Satsangi","SatsangiYear"),
+    ("AthvadikSabha","AthvadikSabhaYear"),
+    ("Ravisabha","RavisabhaYear"),
+    ("GharSatsang","GharSatsangYear"),
+    ("SSP","SSPStage"),
+    ("Ekadashi","EkadashiYear"),
+    ("Niymit_Vanchan","Niymit_VanchanYear"),
+    )}),)
+    
+    def Profile_Completion(self,obj):
+        return format_html(
+            '''
+            <progress value="{0}" max="100"></progress>
+            <span style="font-weight:bold">{0}%</span>
+            ''',
+            Profile_Completion(obj)
+        )
+
     def get_queryset(self, request):
         qs = super(SatsangProfileAdmin, self).get_queryset(request) 
         if request.user.is_superuser:
-            return qs
+            return qs.filter(yuvakProfile__mandal=getMandal(request.user))
         else:
             return qs.filter(yuvakProfile=request.user.yuvakprofile) 
     
@@ -155,7 +182,15 @@ class SatsangProfileAdmin(admin.ModelAdmin):
             self.readonly_fields = []
         return super().change_view(request, object_id, form_url, extra_context)
 
-
+# # Create your models here.
+# class User(AbstractUser):
+    
+#     def set_password(self, raw_password):
+#         if self.force_pswd_first_login is None:
+#             self.default_pwd_updated = False
+#         elif not self.force_pswd_first_login:
+#             self.default_pwd_updated = True
+#         super().set_password(raw_password)
 
 
 admin.site.unregister(User)

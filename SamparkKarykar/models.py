@@ -10,5 +10,5 @@ class KaryakarProfile(models.Model):
     mandal = models.ForeignKey(MandalProfile,on_delete=models.CASCADE,blank=True,null=True)
 
     def __str__(self):
-        return self.mandal.__str__() + ": " +self.profile.FirstName + " " + self.profile.MiddleName +" " + self.profile.SurName
+        return self.profile.FirstName + " " + self.profile.MiddleName +" " + self.profile.SurName
 

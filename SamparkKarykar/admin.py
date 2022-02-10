@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Common.util import is_member
+from Common.util import getMandal, is_member
 
 from SamparkKarykar.models import KaryakarProfile
 
@@ -33,7 +33,7 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(KaryakarProfileAdmin, self).get_queryset(request) 
         if request.user.is_superuser:
-            return qs
+            return qs.filter(profile__mandal=getMandal(request.user))
         elif is_member(request.user,"Sampark Karykar"):
             return qs.filter(profile=request.user.yuvakprofile)
         elif is_member(request.user,"Yuvak"):

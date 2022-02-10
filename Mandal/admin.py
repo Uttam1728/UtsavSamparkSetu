@@ -1,7 +1,8 @@
 from urllib import request
 from django.contrib import admin
-from Common.util import is_member,is_followUpDone, messageIcons
-
+from Common.util import getMandal, is_member,is_followUpDone, messageIcons
+from datetime import date, datetime
+from django.db.models import Q
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -26,49 +27,19 @@ class KaryakramAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(KaryakramAdmin, self).get_queryset(request)
-        self.request = request
-        return qs
-
-    def custom_actions(self,obj):
+        if request.user.is_superuser:
+            return qs.filter(Mandal=getMandal(request.user))
+        else:
+            mandal = getMandal(request.user)
+            curr_date = datetime.now()
+            return qs.filter(Q(Mandal=mandal) & 
+                            Q(End_date__gte=curr_date) & 
+                            Q(is_active=True)).order_by('Karyakram_date')
         
-        table = '''
-            <table>
-                <tr>
-                    <th>
-                        YuvakName
-                    </th>
-                    <th>
-                        Is FollowUp Done :
-                    </th>
-                    <th>
-                        How
-                    </th>
-                    <th>
-                        Submit
-                    </th>
-                </tr>
-        '''
-        if is_member(self.request.user,"Sampark Karykar"):
-            yuvaks = YuvakProfile.objects.filter(karyakarprofile__user = self.request.user)
-
-            for yuvak in yuvaks.all():
-
-                tmp = '<tr>'
-                tmp += '<td>{}</td>'.format(yuvak)
-                tmp += '<td>{}</td>'.format(is_followUpDone(yuvak,self.request.user,obj))
-                tmp += '<td>{}</td>'.format(yuvak)
-                tmp += '<td>{}</td>'.format(yuvak)
-                tmp += '</tr>'
-                table += tmp
-        table += '</table>'
-
-
-        return format_html(table) 
 
     def save_model(self, request, obj, form, change):
         if "_followup_record_create" in request.POST:
             if obj.pk:
-                # print(obj)
                 for karyakar in obj.Mandal.karyakarprofile_set.all():
                     for yuvak in karyakar.Yuvaks.all():
                         if not FollowUp.objects.filter(Karyakram=obj,
@@ -79,9 +50,6 @@ class KaryakramAdmin(admin.ModelAdmin):
                                         Yuvak=yuvak,
                                         Status=FollowupStatus.Pending)
                             f.save()
-                            print(f)
-  
-                pass
             else:
                 msg = format_html(_('Please save karykram first.'))
                 self.message_user(request, msg, messages.WARNING)
