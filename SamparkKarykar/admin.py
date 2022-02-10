@@ -17,10 +17,11 @@ from django.utils.translation import gettext as _
 
 @receiver(post_save, sender=KaryakarProfile)
 def Add_KaryKarGroup(sender, instance, **kwargs):
-    if instance.user is None:
+    if instance.profile.user is not None:
         user = instance.profile.user
-        group = Group.objects.get(name='Sampark Karykar')
-        user.groups.add(group)   
+        if not user.groups.filter(name="Sampark Karykar").exists():
+            group = Group.objects.get(name='Sampark Karykar')
+            user.groups.add(group)   
 
 
 class KaryakarProfileAdmin(admin.ModelAdmin):
