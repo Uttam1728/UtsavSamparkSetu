@@ -1,11 +1,9 @@
 from django.contrib import admin
-from Common.util import getMandal, is_member
-from django.contrib.admin.helpers import ActionForm
-from FolloWUp.models import FollowUp,FollowupStatus, HowMethods
-
+from Common.util import getMandal, is_member, messageIcons
+from FolloWUp.models import FollowUp,FollowupStatus
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html
 from Common.filters import KarykarDropdownFilter,HowDropdownFilter, StatusDropdownFilter, KarykramDropdownFilter
 # Register your models here.
@@ -16,51 +14,61 @@ FollowupStatus.No:("indianred","No")}
 
 
 class FollowUpAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "StatusWithColor", "KarykarName","YuvakName", "How",)
+    change_list_template = 'admin/followup_change_list.html'
+
+    list_display = ("__str__","YuvakName", "StatusWithColor","How","KarykarNames")
     list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,]
-    fieldsets = ((None, {"fields": ("Karyakram","Yuvak","SamparkKarykar","Status","How","Remark")}),)
-    actions = ['change_status']
+    fieldsets = ((None, {"fields": ("Karyakram","KaryKarVrund","Yuvak","Status","Present","How","Remark")}),)
+    list_per_page = 25
+    # actions = ['change_status']
     
-
-    class UpdateStatusActionForm(ActionForm):
-        new_status = forms.ChoiceField(choices=[(tag.value, tag.name) for tag in FollowupStatus], required=True,widget=forms.Select())
-        How  = forms.ChoiceField(choices=[(tag.value, tag.name) for tag in HowMethods], required=True,widget=forms.Select())
+    # commenting as per not need, in future may be
+    # class UpdateStatusActionForm(ActionForm):
+    #     new_status = forms.ChoiceField(choices=[(tag.value, tag.name) for tag in FollowupStatus], required=True,widget=forms.Select())
+    #     How  = forms.ChoiceField(choices=[(tag.value, tag.name) for tag in HowMethods], required=True,widget=forms.Select())
     
-    action_form = UpdateStatusActionForm
+    # action_form = UpdateStatusActionForm
 
 
-    def change_status(self, request, queryset):
+    # def change_status(self, request, queryset):
         
-        new_status = request.POST.get('new_status')
-        how = request.POST.get('How')
-        queryset.update(Status=int(new_status),How=int(how))
+    #     new_status = request.POST.get('new_status')
+    #     how = request.POST.get('How')
+    #     queryset.update(Status=int(new_status),How=int(how))
 
-    change_status.allowed_permissions = ('change',)
-    change_status.short_description = "Mark selected Yuvak as..."
+    # change_status.allowed_permissions = ('change',)
+    # change_status.short_description = "Mark selected Yuvak as..."
 
     def YuvakName(self,obj):
-        return obj.Yuvak.FirstName + " " + obj.Yuvak.SurName
-    
-    def KarykarName(self,obj):
-        return obj.SamparkKarykar.profile.FirstName + " " + obj.SamparkKarykar.profile.SurName
+        return format_html(obj.Yuvak.FirstName + " " +obj.Yuvak.SurName +" : "+ messageIcons(obj.Yuvak.WhatsappNo,20))
+        
+    def KarykarNames(self,obj):
+        s= ''
+        if obj.KaryKarVrund.karykar1profile:
+            s += '<li>{} {}</li>'.format(obj.KaryKarVrund.karykar1profile.FirstName,obj.KaryKarVrund.karykar1profile.SurName)
+        if obj.KaryKarVrund.karykar2profile:
+            s += '<li>{} {}</li>'.format(obj.KaryKarVrund.karykar2profile.FirstName,obj.KaryKarVrund.karykar2profile.SurName)
+        return format_html(s)
     
     def StatusWithColor(self,obj):
-        
         return format_html("<button style='color: black;border-radius: 5px;padding-top: 3px;border: none;background: {};'><b>{}</b></button>".format(color[obj.Status][0],color[obj.Status][1]))
-    
+    StatusWithColor.short_description = "Status"
     def get_queryset(self, request):
         qs = super(FollowUpAdmin, self).get_queryset(request) 
-        if request.user.is_superuser:
-            return qs.filter(SamparkKarykar__profile__mandal=getMandal(request.user))
-
-        elif is_member(request.user,"Sampark Karykar"):
-            return qs.filter(SamparkKarykar__profile__user = request.user)
-        elif is_member(request.user,"Yuvak"):
-            return qs.filter(Yuvak__user=request.user)
+        user = request.user
+        if user.is_superuser:
+            return qs.filter(Karyakram__Mandal=getMandal(user))
+        elif is_member(user,"Sampark Karykar"):
+            try:
+                return qs.filter(Q(KaryKarVrund=request.user.yuvakprofile.Profile1Info))
+            except ObjectDoesNotExist  :
+                return qs.filter(Q(KaryKarVrund=request.user.yuvakprofile.Profile2Info))
+        elif is_member(user,"Yuvak"):
+            return qs.filter(Yuvak__user=user)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if is_member(request.user,"Sampark Karykar"):
-            self.readonly_fields = ["SamparkKarykar","Yuvak","Karyakram"]
+            self.readonly_fields = ["KaryKarVrund","Yuvak","Karyakram"]
         else:
             self.readonly_fields = []
         return super().change_view(request, object_id, form_url, extra_context)
@@ -68,7 +76,8 @@ class FollowUpAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         user = request.user
         if user.is_superuser:
-            self.list_filter.insert(1,KarykarDropdownFilter)
+            # self.list_filter.insert(1,KarykarDropdownFilter)
+            pass
         elif is_member(request.user,"Sampark Karykar"):
              if KarykarDropdownFilter in self.list_filter : 
                 self.list_filter.remove(KarykarDropdownFilter)

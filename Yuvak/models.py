@@ -30,7 +30,7 @@ class YuvakProfile(models.Model):
     DateOfBirth = models.DateField(blank=True,null=True)
     Education = models.CharField(max_length=100,blank=True,null=True)
     user = models.OneToOneField(User,on_delete=models.CASCADE,null=True, blank=True,)
-    mandal = models.ForeignKey(MandalProfile,on_delete=models.CASCADE,blank=True,null=True)
+    mandal = models.ForeignKey(MandalProfile,on_delete=models.CASCADE)
     def __str__(self):
         return self.FirstName + " " + self.MiddleName + " " + self.SurName
 

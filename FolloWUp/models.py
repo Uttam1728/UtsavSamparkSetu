@@ -20,11 +20,16 @@ class FollowupStatus(IntEnum) :
     No = 3,
     InProgress = 4
 
+class PreentStatus(IntEnum):
+    Not_Sure = 1
+    Yes = 2
+    No = 3
+    Unknown = 4
 
 # Create your models here.
 class FollowUp(models.Model):
     Karyakram = models.ForeignKey(Karyakram,on_delete=models.CASCADE)
-    SamparkKarykar = models.ForeignKey(KaryakarProfile,on_delete=models.CASCADE)
+    KaryKarVrund = models.ForeignKey(KaryakarProfile,on_delete=models.CASCADE)
     Yuvak = models.ForeignKey(YuvakProfile,on_delete=models.CASCADE)
     FollowUp_Time = models.DateTimeField(auto_now_add=True)
     LastFollowUp_Time = models.DateTimeField(auto_now=True)
@@ -36,6 +41,10 @@ class FollowUp(models.Model):
     Status = models.IntegerField(
                 default=FollowupStatus.Pending,
                 choices=[(status.value, status.name) for status in FollowupStatus]  # Choices is a list of Tuple
+             )
+    Present = models.IntegerField(
+                default=PreentStatus.Unknown,
+                choices=[(statis.value, statis.name) for statis in PreentStatus]  # Choices is a list of Tuple
              )
 
     def __str__(self):

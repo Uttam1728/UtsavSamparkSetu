@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from Common.util import  Profile_Completion, getMandal, is_member, messageIcons
-
+from django.db.models import Q
 from django.utils.html import format_html
 from Yuvak.models import SatsangProfile, YuvakProfile
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext as _
 # method for updating
 @receiver(post_save, sender=YuvakProfile)
@@ -51,8 +52,8 @@ class RoleFilter(admin.SimpleListFilter):
 class YuvakProfileAdmin(admin.ModelAdmin):
     
     change_list_template = 'admin/yuvak_change_list.html'
-    
     list_display = ("__str__", "Profile_Completion", "WhatsApp","Call","SMS","user")
+    list_per_page = 20
 
     def WhatsApp(self,obj):
         buttons = ''
@@ -87,7 +88,10 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs.filter(mandal=getMandal(request.user))
         elif is_member(request.user,"Sampark Karykar"):
-            return YuvakProfile.objects.filter(karyakarprofile__profile__user = request.user)
+            try:
+                return qs.filter(Q(karyakarprofile=request.user.yuvakprofile.Profile1Info) | Q(pk=request.user.yuvakprofile.pk))
+            except ObjectDoesNotExist  :
+                return qs.filter(Q(karyakarprofile=request.user.yuvakprofile.Profile2Info) | Q(pk=request.user.yuvakprofile.pk))
         elif is_member(request.user,"Yuvak"):
             return qs.filter(pk=request.user.yuvakprofile.pk)
         
@@ -115,7 +119,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         return ",".join(group_names)
 
 class UserAdmin(AuthUserAdmin):
-    
+    list_per_page = 20
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
 
@@ -157,7 +161,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
     ("Ekadashi","EkadashiYear"),
     ("Niymit_Vanchan","Niymit_VanchanYear"),
     )}),)
-    
+    list_per_page = 20
     def Profile_Completion(self,obj):
         return format_html(
             '''
@@ -171,8 +175,16 @@ class SatsangProfileAdmin(admin.ModelAdmin):
         qs = super(SatsangProfileAdmin, self).get_queryset(request) 
         if request.user.is_superuser:
             return qs.filter(yuvakProfile__mandal=getMandal(request.user))
-        else:
-            return qs.filter(yuvakProfile=request.user.yuvakprofile) 
+        # else:
+        #     return qs.filter(yuvakProfile=request.user.yuvakprofile) 
+        elif is_member(request.user,"Sampark Karykar"):
+            try:
+                yuvaklist =  YuvakProfile.objects.filter(Q(karyakarprofile=request.user.yuvakprofile.Profile2Info) | Q(pk=request.user.yuvakprofile.pk))
+            except ObjectDoesNotExist  :
+                yuvaklist = YuvakProfile.objects.filter(Q(karyakarprofile=request.user.yuvakprofile.Profile2Info) | Q(pk=request.user.yuvakprofile.pk))
+            return qs.filter(Q(yuvakProfile__in = yuvaklist))
+        elif is_member(request.user,"Yuvak"):
+            return qs.filter(pk=request.user.yuvakprofile.pk)
     
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if not request.user.is_superuser:

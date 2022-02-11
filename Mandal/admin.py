@@ -40,16 +40,11 @@ class KaryakramAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if "_followup_record_create" in request.POST:
             if obj.pk:
-                for karyakar in obj.Mandal.karyakarprofile_set.all():
-                    for yuvak in karyakar.Yuvaks.all():
-                        if not FollowUp.objects.filter(Karyakram=obj,
-                                    SamparkKarykar=karyakar,
-                                    Yuvak=yuvak).exists():
-                            f = FollowUp(Karyakram=obj,
-                                        SamparkKarykar=karyakar,
-                                        Yuvak=yuvak,
-                                        Status=FollowupStatus.Pending)
-                            f.save()
+                for karyakar_vrund in obj.Mandal.karyakarprofile_set.all():
+                    for yuvak in karyakar_vrund.Yuvaks.all():
+                        FollowUp.objects.get_or_create(Karyakram=obj,
+                                        KaryKarVrund=karyakar_vrund,
+                                        Yuvak=yuvak)
             else:
                 msg = format_html(_('Please save karykram first.'))
                 self.message_user(request, msg, messages.WARNING)
@@ -59,9 +54,9 @@ class KaryakramAdmin(admin.ModelAdmin):
 
 class MandalProfileAdmin(admin.ModelAdmin):
     change_list_template = 'admin/mandal_change_list.html'
-
     list_display = ("__str__", "Nirikshak_details", "Sanchalak_details",)
-    
+    list_per_page = 20
+
     def Nirikshak_details(self,obj):
         if obj.Nirikshak : 
             return format_html(obj.Nirikshak.FirstName + " " +obj.Nirikshak.SurName +" : "+ messageIcons(obj.Nirikshak.WhatsappNo,20))

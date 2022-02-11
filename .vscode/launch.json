@@ -8,11 +8,12 @@
             "name": "Python: Django",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\manage.py",
+            "program": "${workspaceFolder}\\manage.py ",
             "python": "D:\\Utsav\\scripts\\python.exe",
             
             "args": [
-                "runserver"
+                "runserver",
+                "127.0.0.1:8001"
             ],
             "django": true,
             "justMyCode" : false
