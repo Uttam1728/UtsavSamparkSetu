@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='followup',
             name='Present',
-            field=models.IntegerField(choices=[(1, 'Not_Sure'), (2, 'Yes'), (3, 'No'), (4, 'Unknown')], default=FolloWUp.models.PreentStatus['Unknown']),
+            field=models.IntegerField(choices=[(1, 'Not_Sure'), (2, 'Yes'), (3, 'No')]),
         ),
     ]

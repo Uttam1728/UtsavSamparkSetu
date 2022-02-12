@@ -24,7 +24,6 @@ class PreentStatus(IntEnum):
     Not_Sure = 1
     Yes = 2
     No = 3
-    Unknown = 4
 
 # Create your models here.
 class FollowUp(models.Model):
@@ -43,8 +42,8 @@ class FollowUp(models.Model):
                 choices=[(status.value, status.name) for status in FollowupStatus]  # Choices is a list of Tuple
              )
     Present = models.IntegerField(
-                default=PreentStatus.Unknown,
                 choices=[(statis.value, statis.name) for statis in PreentStatus]  # Choices is a list of Tuple
+                ,blank=True,null=True
              )
 
     def __str__(self):

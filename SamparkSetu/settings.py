@@ -33,6 +33,8 @@ ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com','drive.google.com']
 # Application definition
 
 INSTALLED_APPS = [
+    
+    'rangefilter',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +44,7 @@ INSTALLED_APPS = [
     'Yuvak',
     'SamparkKarykar',
     'Mandal',
-    'FolloWUp'
+    'FolloWUp',
 ]
 
 MIDDLEWARE = [

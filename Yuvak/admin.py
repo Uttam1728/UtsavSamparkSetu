@@ -1,5 +1,7 @@
+from django.urls import reverse
 from django.contrib import admin
 
+from rangefilter.filter import DateRangeFilter,DateTimeRangeFilter
 from Common.util import  Profile_Completion, getMandal, is_member, messageIcons
 from django.db.models import Q
 from django.utils.html import format_html
@@ -52,8 +54,10 @@ class RoleFilter(admin.SimpleListFilter):
 class YuvakProfileAdmin(admin.ModelAdmin):
     
     # change_list_template = 'admin/yuvak_change_list.html'
-    list_display = ("__str__", "Profile_Completion", "WhatsApp","Call","SMS","user")
+    list_display = ("__str__", "Profile_Completion", "WhatsApp","Call","SMS","userLink")
     list_per_page = 20
+    list_filter = [RoleFilter,("DateOfBirth",DateRangeFilter)]
+    search_fields = ('FirstName__icontains','SurName__icontains')
 
     def WhatsApp(self,obj):
         buttons = ''
@@ -81,7 +85,22 @@ class YuvakProfileAdmin(admin.ModelAdmin):
 
     def MessageIcons(self,obj):
         return format_html(messageIcons(obj.WhatsappNo,27))
+    
+    def userLink(self,obj):
+        return format_html('<a href="{}">{}</a>'.format(reverse('admin:auth_user_change',kwargs={'object_id':obj.user.pk}),obj.user))
+    userLink.short_description = "User"
     MessageIcons.short_description = 'Connect'
+
+    def get_list_filter(self,request):
+        if not request.user.is_superuser:
+            return []
+        return super().get_list_filter(request)
+    
+    def get_search_fields(self,request):
+        if is_member(request.user,"Yuvak"):
+            return []
+        return super().get_search_fields(request)
+
 
     def get_queryset(self, request):
         qs = super(YuvakProfileAdmin, self).get_queryset(request) 
@@ -94,16 +113,14 @@ class YuvakProfileAdmin(admin.ModelAdmin):
                 return qs.filter(Q(karyakarprofile=request.user.yuvakprofile.Profile2Info) | Q(pk=request.user.yuvakprofile.pk))
         elif is_member(request.user,"Yuvak"):
             return qs.filter(pk=request.user.yuvakprofile.pk)
-        
-    def changelist_view(self, request, extra_context=None):
-        user = request.user
-        if user.is_superuser:
-            self.list_filter = [RoleFilter]
-            if "Role" not in self.list_display:
-                 self.list_display += ("Role",)
-        else:
-            self.list_filter = []
-        return super(YuvakProfileAdmin, self).changelist_view(request, extra_context=None)
+   
+    def get_search_results(self, request, queryset, search_term):
+        type = request.GET.get('field_name','')
+        if type == "Yuvaks":
+            queryset =queryset.filter(karyakarprofile__isnull=True).all()
+        elif type in ['karykar2profile', 'karykar1profile']:
+            queryset = queryset.exclude(Q(Profile1Info__isnull=False) | Q(Profile2Info__isnull=False)).all()
+        return super().get_search_results(request, queryset, search_term)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if not request.user.is_superuser:
@@ -139,21 +156,27 @@ class UserAdmin(AuthUserAdmin):
             return ((None, {"fields": ("username","password","email")}),)
         else:
             return super().get_fieldsets(request, obj)
-    def changelist_view(self, request, extra_context=None):
-        user = request.user
-        if not user.is_superuser:
-            self.list_filter = []
-            self.list_display = ['__str__','email','password']
-            self.search_fields = []
-            
-        return super(UserAdmin, self).changelist_view(request, extra_context=None)
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
+    
+    def get_list_display(self,request):
         if not request.user.is_superuser:
-            self.readonly_fields = ('username',)
-        else:
-            self.readonly_fields = ()
-        return super(UserAdmin, self).change_view(request, object_id, extra_context)
+            return ['__str__','email','password']
+        return super().get_list_display(request)
+
+    def get_list_filter(self,request):
+        if not request.user.is_superuser:
+            return []
+        return super().get_list_filter(request)
+    
+    def get_search_fields(self,request):
+        if not request.user.is_superuser:
+            return []
+        return super().get_search_fields(request)
+
+    def get_readonly_fields(self, request, obj) :
+        if not request.user.is_superuser:
+            return ('username',)
+        return super().get_readonly_fields(request, obj)
+
 
 class SatsangProfileAdmin(admin.ModelAdmin):
     list_display = ("__str__", "Profile_Completion",)

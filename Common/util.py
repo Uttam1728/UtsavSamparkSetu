@@ -20,11 +20,12 @@ def getLatestKarykram(samparkKarykar):
                                         Q(End_date__gte=curr_date)) ).order_by('Karyakram_date')
 
 
-def messageIcons(phoneNo,size=27):
+def messageIcons(phoneNo,size=27,message=True):
     buttons = ''
     buttons += "&nbsp; <a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:{}px;color:green'></i></a>".format(phoneNo,size)
     buttons += "&nbsp; <a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:{}px;color:deepskyblue;margin-left:5px'></i> </a>".format(phoneNo,size)
-    buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:{}px;color:lightblue;margin-left:5px'></i> </a>".format(phoneNo,size)  
+    if message:
+        buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:{}px;color:lightblue;margin-left:5px'></i> </a>".format(phoneNo,size)  
     # buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-send-o' style='font-size:27px;color:deepskyblue;margin-left:5px'></i> </a>".format(phoneNo)
     
     # <img src='/Photos/whatsapp-logo.png' alt='Whatsapp' width='25'📲 height='25'>
