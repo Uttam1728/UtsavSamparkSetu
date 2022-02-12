@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block title %} {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+
+{% block extrahead %}
+    <link rel="shortcut icon" href="{% static 'img/utsav.png' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+{% endblock %}

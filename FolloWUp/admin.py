@@ -14,7 +14,7 @@ FollowupStatus.No:("indianred","No")}
 
 
 class FollowUpAdmin(admin.ModelAdmin):
-    change_list_template = 'admin/followup_change_list.html'
+    # change_list_template = 'admin/followup_change_list.html'
 
     list_display = ("__str__","YuvakName", "StatusWithColor","How","KarykarNames")
     list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,]

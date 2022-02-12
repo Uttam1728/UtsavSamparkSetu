@@ -53,7 +53,7 @@ class KaryakramAdmin(admin.ModelAdmin):
             return super().save_model(request, obj, form, change)
 
 class MandalProfileAdmin(admin.ModelAdmin):
-    change_list_template = 'admin/mandal_change_list.html'
+    # change_list_template = 'admin/mandal_change_list.html'
     list_display = ("__str__", "Nirikshak_details", "Sanchalak_details",)
     list_per_page = 20
 

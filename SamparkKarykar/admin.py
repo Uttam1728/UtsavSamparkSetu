@@ -31,7 +31,7 @@ def Add_KaryKarGroup(sender, instance, **kwargs):
 
 class KaryakarProfileAdmin(admin.ModelAdmin):
     
-    change_list_template = 'admin/karykar_change_list.html'
+    # change_list_template = 'admin/karykar_change_list.html'
     list_display = ("__str__","SamparkKarykar1", "SamparkKarykar2") # "WhatsApp","Call","SMS","username")
     list_per_page = 20
     

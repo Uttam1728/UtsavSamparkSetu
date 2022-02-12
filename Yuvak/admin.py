@@ -51,7 +51,7 @@ class RoleFilter(admin.SimpleListFilter):
 
 class YuvakProfileAdmin(admin.ModelAdmin):
     
-    change_list_template = 'admin/yuvak_change_list.html'
+    # change_list_template = 'admin/yuvak_change_list.html'
     list_display = ("__str__", "Profile_Completion", "WhatsApp","Call","SMS","user")
     list_per_page = 20
 
@@ -134,6 +134,11 @@ class UserAdmin(AuthUserAdmin):
             self.list_filter = []
             return qs.filter(pk=request.user.id) 
     
+    def get_fieldsets(self, request, obj) :
+        if not request.user.is_superuser:
+            return ((None, {"fields": ("username","password","email")}),)
+        else:
+            return super().get_fieldsets(request, obj)
     def changelist_view(self, request, extra_context=None):
         user = request.user
         if not user.is_superuser:
@@ -145,8 +150,9 @@ class UserAdmin(AuthUserAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if not request.user.is_superuser:
-            self.fieldsets = ((None, {"fields": ("username","password","email")}),)
-        
+            self.readonly_fields = ('username',)
+        else:
+            self.readonly_fields = ()
         return super(UserAdmin, self).change_view(request, object_id, extra_context)
 
 class SatsangProfileAdmin(admin.ModelAdmin):
