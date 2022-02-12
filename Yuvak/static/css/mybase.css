@@ -20,7 +20,6 @@
   .homebg {
 
     background-image: url(../img/homebg.jpg);
-    /* background-image: url(home-bg-new.jpg); */
     background-attachment: fixed !important;
     /*overflow:hidden;*/
     background-size: inherit;
