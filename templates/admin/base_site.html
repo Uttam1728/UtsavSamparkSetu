@@ -1,10 +1,34 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
-{% block title %} {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block title %} 
+{{ site_title|default:_('Django site admin') }}
 
+{% endblock %}
 
 {% block extrahead %}
     <link rel="shortcut icon" href="{% static 'img/utsav.png' %}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+{% endblock %}
+
+{% block extrastyle  %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/mybase.css' %}">
+  
+{% endblock %}
+{% block branding %}
+<center id="guruparampara_1">
+    <img src="{% static 'img/swaminarayan.png' %}" width="50px" hight="50px"/>
+    <img src="{% static 'img/gunatitanandswami.png' %}" width="50px" hight="50px"/>
+</center>
+<center id="guruparampara_2">
+<img src="{% static 'img/bhagataji_maharaj.png' %}" width="50px" hight="50px"/>
+<img src="{% static 'img/Shastriji_Maharaj.png' %}" width="50px" hight="50px"/>
+<img src="{% static 'img/yogiji_maharaj.png' %}" width="50px" hight="50px"/>
+<img src="{% static 'img/psm.png' %}" width="50px" hight="50px"/>
+<img src="{% static 'img/msm.png' %}" width="50px" hight="50px"/>
+</center>
+
+
+<h1 id="site-name" style="text-align: center; font-size:30px"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
 
 {% endblock %}
