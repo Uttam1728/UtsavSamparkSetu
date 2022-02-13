@@ -41,7 +41,7 @@ class FollowUp(models.Model):
                 default=FollowupStatus.Pending,
                 choices=[(status.value, status.name) for status in FollowupStatus]  # Choices is a list of Tuple
              )
-    Present = models.IntegerField(
+    Coming = models.IntegerField(
                 choices=[(statis.value, statis.name) for statis in PreentStatus]  # Choices is a list of Tuple
                 ,blank=True,null=True
              )

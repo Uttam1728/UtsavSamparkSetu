@@ -24,20 +24,20 @@ class FollowUpAdminForm(forms.ModelForm):
         # Validation goes here :)
         # print(sel/f)
         cleaned_data  =self.cleaned_data
-        if cleaned_data['Present'] is None: 
-            raise forms.ValidationError("Present Status Required! Please Add it") 
+        if cleaned_data['Coming'] is None: 
+            raise forms.ValidationError("Coming Status Required! Please Add it") 
         if cleaned_data['Status'] != FollowupStatus.Done:
             raise forms.ValidationError("Status is not selected as Done, please select!")
-        if cleaned_data['Present'] != PreentStatus.Yes :
+        if cleaned_data['Coming'] != PreentStatus.Yes :
             if  cleaned_data["Remark"] is None or cleaned_data["Remark"] == "":
                 raise forms.ValidationError("Remark Required! Please Add it")   
 
 class FollowUpAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/followup_change_list.html'
 
-    list_display = ("__str__","YuvakName", "StatusWithColor","PresentLogo","How","Karykar_Names")
+    list_display = ("__str__","YuvakName", "StatusWithColor","ComingLogo","How","Karykar_Names")
     list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,KarykarDropdownFilter]
-    fieldsets = ((None, {"fields": ("Karyakram","KaryKarVrund","Yuvak","Status","Present","How","Remark")}),)
+    fieldsets = ((None, {"fields": ("Karyakram","KaryKarVrund","Yuvak","Status","Coming","How","Remark")}),)
     list_per_page = 25
     form = FollowUpAdminForm
     
@@ -57,17 +57,17 @@ class FollowUpAdmin(admin.ModelAdmin):
         return format_html("<button style='color: black;border-radius: 5px;padding-top: 3px;border: none;background: {};'><b>{}</b></button>".format(color[obj.Status][0],color[obj.Status][1]))
     StatusWithColor.short_description = "Status"
     
-    def PresentLogo(self,obj):
+    def ComingLogo(self,obj):
         if obj.Status == FollowupStatus.Done:
-            if obj.Present == PreentStatus.Yes:
+            if obj.Coming == PreentStatus.Yes:
                 return format_html('<img src="/static/admin/img/icon-yes.svg" alt="Yes">')
-            elif obj.Present == PreentStatus.No:
+            elif obj.Coming == PreentStatus.No:
                 return format_html('<img src="/static/admin/img/icon-no.svg" alt="No">'+"-"+obj.Remark)
-            elif obj.Present == PreentStatus.Not_Sure:
+            elif obj.Coming == PreentStatus.Not_Sure:
                 return format_html('<img src="/static/admin/img/icon-unknown.svg" alt="Not Sure">'+"-"+ obj.Remark)
             
         return ""
-    PresentLogo.short_description = "Coming?"
+    ComingLogo.short_description = "Coming?"
     
     '''
     # actions = ['change_status']

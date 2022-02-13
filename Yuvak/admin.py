@@ -51,13 +51,40 @@ class RoleFilter(admin.SimpleListFilter):
             return queryset
         return queryset.filter(user__groups__name = groupName)
 
+class KaryKarAlloatMentFilter(admin.SimpleListFilter):
+    title = 'Karykar Alloted'
+    parameter_name = 'alloted'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Yes', 'Yes'),
+            ('No',  'No'),
+        )
+
+    def queryset(self, request, queryset):
+        alloted = self.value()
+        if alloted is None:
+            return queryset
+        elif alloted == "Yes":
+            return queryset.filter(karyakarprofile__isnull=False)
+        elif alloted == "No":
+            return queryset.filter(karyakarprofile__isnull = True)
+
+
 class YuvakProfileAdmin(admin.ModelAdmin):
     
     # change_list_template = 'admin/yuvak_change_list.html'
-    list_display = ("__str__", "Profile_Completion", "WhatsApp","Call","SMS","userLink","Role")
+    list_display = ("Yuvak", "Profile_Completion", "WhatsApp","Call","SMS","userLink","Role")
     list_per_page = 20
-    list_filter = [RoleFilter,("DateOfBirth",DateRangeFilter)]
+    list_filter = [RoleFilter,("DateOfBirth",DateRangeFilter),KaryKarAlloatMentFilter]
     search_fields = ('FirstName__icontains','SurName__icontains')
+
+    def Yuvak(self,obj):
+        s = obj.__str__()
+        if obj.karyakarprofile_set.exists():
+            s += ' <img src="/static/admin/img/icon-yes.svg" alt="Yes">'
+        return format_html(s)
+
 
     def WhatsApp(self,obj):
         buttons = ''
@@ -104,7 +131,9 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     
     def get_search_fields(self,request):
         if not request.user.is_superuser:
-            if not is_member(request.user,"Sampark Karykar"):
+            if is_member(request.user,"Sampark Karykar"):
+                return [RoleFilter,("DateOfBirth",DateRangeFilter)]
+            elif is_member(request.user,"Yuvak"):
                 return []
         return super().get_search_fields(request)
 
