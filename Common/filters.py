@@ -15,17 +15,19 @@ class KarykarDropdownFilter(admin.SimpleListFilter):
     
     def lookups(self, request, model_admin):
         # Dummy, required to show the filter.
-        all_karykars = KaryakarProfile.objects.filter(profile__mandal=request.user.yuvakprofile.mandal)
+        all_karykars = KaryakarProfile.objects.filter(mandal=request.user.yuvakprofile.mandal)
         query_objs = tuple()
         for karykar in all_karykars.all():
-            query_objs += ((karykar.pk,_(karykar.__str__())),)
-
+            query_objs += ((karykar.pk,_(karykar.karykar1profile.__str__())),)
+            if karykar.karykar2profile:
+                query_objs += ((karykar.pk,_(karykar.karykar2profile.__str__())),)
+            
         return query_objs
 
     def queryset(self, request, queryset):
         if self.value() is not None:
             return queryset.filter(
-                Q(SamparkKarykar__id=self.value())
+                Q(KaryKarVrund__id=self.value())
             )
 
 class HowDropdownFilter(admin.SimpleListFilter):

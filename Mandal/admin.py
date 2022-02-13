@@ -15,28 +15,26 @@ from Yuvak.models import YuvakProfile
 
 class KaryakramAdmin(admin.ModelAdmin):
     change_form_template = "admin/karyakram_change_form.html"
-    
-    
-    
     list_display = ("__str__", "Karyakram_date", "is_active", "For_All","Start_date","End_date")
-    # fieldsets = (("KaryKram Details", {'fields': ('Title', 'is_active', 'Start_date', 'End_date', 'Mandal', 'For_All')}),
-    #              ("Yuvak FollowUp", {"fields": ("custom_actions", )}),
-    #              )
-    # readonly_fields = ('custom_actions',)
-
+    list_per_page = 20
+    
+    def get_fieldsets(self, request, obj) :
+        if not request.user.is_superuser:
+            if not is_member(request.user,"Sampark Karykar"):
+                return ((None, {"fields": ("Title","is_active","Karyakram_date","Mandal")}),)
+        return super().get_fieldsets(request, obj)
+    
 
     def get_queryset(self, request):
         qs = super(KaryakramAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs.filter(Mandal=getMandal(request.user))
-        else:
-            mandal = getMandal(request.user)
-            curr_date = datetime.now()
-            return qs.filter(Q(Mandal=mandal) & 
-                            Q(End_date__gte=curr_date) & 
-                            Q(is_active=True)).order_by('Karyakram_date')
-        
+        return qs.filter(Mandal=getMandal(request.user)).order_by('-Karyakram_date')
 
+    def get_list_display(self,request):
+        if not request.user.is_superuser:
+            if not is_member(request.user,"Sampark Karykar"):
+                return ["__str__", "Karyakram_date", "is_active",]
+        return super().get_list_display(request)
+   
     def save_model(self, request, obj, form, change):
         if "_followup_record_create" in request.POST:
             if obj.pk:
@@ -59,11 +57,11 @@ class MandalProfileAdmin(admin.ModelAdmin):
 
     def Nirikshak_details(self,obj):
         if obj.Nirikshak : 
-            return format_html(obj.Nirikshak.FirstName + " " +obj.Nirikshak.SurName +" : "+ messageIcons(obj.Nirikshak.WhatsappNo,20))
+            return format_html(obj.Nirikshak.FirstName + " " +obj.Nirikshak.SurName +" <br> "+ messageIcons(obj.Nirikshak.WhatsappNo,20))
         return ''
     def Sanchalak_details(self,obj):
         if obj.Sanchalak:
-            return format_html(obj.Sanchalak.FirstName + " " +obj.Sanchalak.SurName +" : " + messageIcons(obj.Nirikshak.WhatsappNo,20))
+            return format_html(obj.Sanchalak.FirstName + " " +obj.Sanchalak.SurName +" <br> " + messageIcons(obj.Nirikshak.WhatsappNo,20))
         return ''
         
 admin.site.register(MandalProfile,MandalProfileAdmin)

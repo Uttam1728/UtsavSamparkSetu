@@ -54,7 +54,7 @@ class RoleFilter(admin.SimpleListFilter):
 class YuvakProfileAdmin(admin.ModelAdmin):
     
     # change_list_template = 'admin/yuvak_change_list.html'
-    list_display = ("__str__", "Profile_Completion", "WhatsApp","Call","SMS","userLink")
+    list_display = ("__str__", "Profile_Completion", "WhatsApp","Call","SMS","userLink","Role")
     list_per_page = 20
     list_filter = [RoleFilter,("DateOfBirth",DateRangeFilter)]
     search_fields = ('FirstName__icontains','SurName__icontains')
@@ -63,17 +63,20 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         buttons = ''
         buttons += "<a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(obj.WhatsappNo)
         return format_html(buttons)
+    WhatsApp.short_description = " "
 
     def Call(self,obj):
         buttons = ''
         buttons += "<a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;'></i> </a>".format(obj.WhatsappNo)
         return format_html(buttons)
-    
+    Call.short_description = " "
+
     def SMS(self,obj):
         buttons = ''
         buttons += "<a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;'></i> </a>".format(obj.WhatsappNo)  
         return format_html(buttons)
-    
+    SMS.short_description = " "
+
     def Profile_Completion(self,obj):
         return format_html(
             '''
@@ -83,24 +86,32 @@ class YuvakProfileAdmin(admin.ModelAdmin):
             Profile_Completion(obj)
         )
 
-    def MessageIcons(self,obj):
-        return format_html(messageIcons(obj.WhatsappNo,27))
-    
     def userLink(self,obj):
         return format_html('<a href="{}">{}</a>'.format(reverse('admin:auth_user_change',kwargs={'object_id':obj.user.pk}),obj.user))
     userLink.short_description = "User"
-    MessageIcons.short_description = 'Connect'
+
+    def Role(self,obj):
+            group_names = []
+            for g in obj.user.groups.all():
+                group_names.append(g.name)
+            return ",".join(group_names)
 
     def get_list_filter(self,request):
         if not request.user.is_superuser:
-            return []
+            if not is_member(request.user,"Sampark Karykar"):
+                return []
         return super().get_list_filter(request)
     
     def get_search_fields(self,request):
-        if is_member(request.user,"Yuvak"):
-            return []
+        if not request.user.is_superuser:
+            if not is_member(request.user,"Sampark Karykar"):
+                return []
         return super().get_search_fields(request)
 
+    def get_readonly_fields(self, request, obj) :
+        if not request.user.is_superuser:
+            return ["user","mandal"]
+        return super().get_readonly_fields(request, obj)
 
     def get_queryset(self, request):
         qs = super(YuvakProfileAdmin, self).get_queryset(request) 
@@ -121,19 +132,6 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         elif type in ['karykar2profile', 'karykar1profile']:
             queryset = queryset.exclude(Q(Profile1Info__isnull=False) | Q(Profile2Info__isnull=False)).all()
         return super().get_search_results(request, queryset, search_term)
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        if not request.user.is_superuser:
-            self.readonly_fields = ["user","mandal"]
-        else:
-            self.readonly_fields = []
-        return super().change_view(request, object_id, form_url, extra_context)
-
-    def Role(self,obj):
-        group_names = []
-        for g in obj.user.groups.all():
-            group_names.append(g.name)
-        return ",".join(group_names)
 
 class UserAdmin(AuthUserAdmin):
     list_per_page = 20
@@ -177,9 +175,8 @@ class UserAdmin(AuthUserAdmin):
             return ('username',)
         return super().get_readonly_fields(request, obj)
 
-
 class SatsangProfileAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "Profile_Completion",)
+    list_display = ("__str__", "Profile_Completion","WhatsApp","Call","SMS",)
     fieldsets = ((None, {"fields": (("NityaPuja","NityaPujaYear"),
     ("TilakChandlo","TilakChandloYear"),
     ("Satsangi","SatsangiYear"),
@@ -191,6 +188,26 @@ class SatsangProfileAdmin(admin.ModelAdmin):
     ("Niymit_Vanchan","Niymit_VanchanYear"),
     )}),)
     list_per_page = 20
+    search_fields = ('yuvakProfile__FirstName__icontains','yuvakProfile__SurName__icontains')
+    
+    def WhatsApp(self,obj):
+        buttons = ''
+        buttons += "<a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(obj.yuvakProfile.WhatsappNo)
+        return format_html(buttons)
+    WhatsApp.short_description = " "
+    
+    def Call(self,obj):
+        buttons = ''
+        buttons += "<a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;'></i> </a>".format(obj.yuvakProfile.WhatsappNo)
+        return format_html(buttons)
+    Call.short_description = " "
+
+    def SMS(self,obj):
+        buttons = ''
+        buttons += "<a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;'></i> </a>".format(obj.yuvakProfile.WhatsappNo)  
+        return format_html(buttons)
+    SMS.short_description = " "
+
     def Profile_Completion(self,obj):
         return format_html(
             '''
@@ -199,6 +216,12 @@ class SatsangProfileAdmin(admin.ModelAdmin):
             ''',
             Profile_Completion(obj)
         )
+
+    def get_search_fields(self,request):
+        if not request.user.is_superuser:
+            if not is_member(request.user,"Sampark Karykar"):
+                return []
+        return super().get_search_fields(request)
 
     def get_queryset(self, request):
         qs = super(SatsangProfileAdmin, self).get_queryset(request) 
@@ -213,24 +236,15 @@ class SatsangProfileAdmin(admin.ModelAdmin):
                 yuvaklist = YuvakProfile.objects.filter(Q(karyakarprofile=request.user.yuvakprofile.Profile2Info) | Q(pk=request.user.yuvakprofile.pk))
             return qs.filter(Q(yuvakProfile__in = yuvaklist))
         elif is_member(request.user,"Yuvak"):
-            return qs.filter(pk=request.user.yuvakprofile.pk)
+            return qs.filter(yuvakProfile=request.user.yuvakprofile)
     
-    def change_view(self, request, object_id, form_url='', extra_context=None):
+    def get_readonly_fields(self, request, obj) :
         if not request.user.is_superuser:
-            self.readonly_fields = ["yuvakProfile"]
-        else:
-            self.readonly_fields = []
-        return super().change_view(request, object_id, form_url, extra_context)
+            return ('yuvakProfile',)
+        return super().get_readonly_fields(request, obj)
 
-# # Create your models here.
-# class User(AbstractUser):
-    
-#     def set_password(self, raw_password):
-#         if self.force_pswd_first_login is None:
-#             self.default_pwd_updated = False
-#         elif not self.force_pswd_first_login:
-#             self.default_pwd_updated = True
-#         super().set_password(raw_password)
+
+
 
 
 admin.site.unregister(User)

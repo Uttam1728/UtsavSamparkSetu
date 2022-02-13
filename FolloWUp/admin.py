@@ -35,34 +35,17 @@ class FollowUpAdminForm(forms.ModelForm):
 class FollowUpAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/followup_change_list.html'
 
-    list_display = ("__str__","YuvakName", "StatusWithColor","PresentLogo","How","KarykarNames")
-    list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,]
+    list_display = ("__str__","YuvakName", "StatusWithColor","PresentLogo","How","Karykar_Names")
+    list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,KarykarDropdownFilter]
     fieldsets = ((None, {"fields": ("Karyakram","KaryKarVrund","Yuvak","Status","Present","How","Remark")}),)
     list_per_page = 25
     form = FollowUpAdminForm
-    # actions = ['change_status']
     
-    # commenting as per not need, in future may be
-    # class UpdateStatusActionForm(ActionForm):
-    #     new_status = forms.ChoiceField(choices=[(tag.value, tag.name) for tag in FollowupStatus], required=True,widget=forms.Select())
-    #     How  = forms.ChoiceField(choices=[(tag.value, tag.name) for tag in HowMethods], required=True,widget=forms.Select())
     
-    # action_form = UpdateStatusActionForm
-
-
-    # def change_status(self, request, queryset):
-        
-    #     new_status = request.POST.get('new_status')
-    #     how = request.POST.get('How')
-    #     queryset.update(Status=int(new_status),How=int(how))
-
-    # change_status.allowed_permissions = ('change',)
-    # change_status.short_description = "Mark selected Yuvak as..."
-
     def YuvakName(self,obj):
         return format_html(obj.Yuvak.FirstName + " " +obj.Yuvak.SurName +" <br> "+ messageIcons(obj.Yuvak.WhatsappNo,20,False))
         
-    def KarykarNames(self,obj):
+    def Karykar_Names(self,obj):
         s= ''
         if obj.KaryKarVrund.karykar1profile:
             s += '<li>{} {}</li>'.format(obj.KaryKarVrund.karykar1profile.FirstName,obj.KaryKarVrund.karykar1profile.SurName)
@@ -85,7 +68,28 @@ class FollowUpAdmin(admin.ModelAdmin):
             
         return ""
     PresentLogo.short_description = "Coming?"
+    
+    '''
+    # actions = ['change_status']
+    
+    # commenting as per not need, in future may be
+    # class UpdateStatusActionForm(ActionForm):
+    #     new_status = forms.ChoiceField(choices=[(tag.value, tag.name) for tag in FollowupStatus], required=True,widget=forms.Select())
+    #     How  = forms.ChoiceField(choices=[(tag.value, tag.name) for tag in HowMethods], required=True,widget=forms.Select())
+    
+    # action_form = UpdateStatusActionForm
 
+
+    # def change_status(self, request, queryset):
+        
+    #     new_status = request.POST.get('new_status')
+    #     how = request.POST.get('How')
+    #     queryset.update(Status=int(new_status),How=int(how))
+
+    # change_status.allowed_permissions = ('change',)
+    # change_status.short_description = "Mark selected Yuvak as..."
+    '''
+    
     def get_queryset(self, request):
         qs = super(FollowUpAdmin, self).get_queryset(request) 
         user = request.user
@@ -98,14 +102,17 @@ class FollowUpAdmin(admin.ModelAdmin):
                 return qs.filter(Q(KaryKarVrund=request.user.yuvakprofile.Profile2Info))
         elif is_member(user,"Yuvak"):
             return qs.filter(Yuvak__user=user)
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        if is_member(request.user,"Sampark Karykar"):
-            self.readonly_fields = ["KaryKarVrund","Yuvak","Karyakram"]
-        else:
-            self.readonly_fields = []
-        return super().change_view(request, object_id, form_url, extra_context)
     
+    def get_readonly_fields(self, request, obj) :
+        if not request.user.is_superuser:
+            return  ["KaryKarVrund","Yuvak","Karyakram"]
+        return super().get_readonly_fields(request, obj)
+    
+    def get_list_filter(self,request):
+        if not request.user.is_superuser:
+            return [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,]
+        return super().get_list_filter(request)
+        
     def changelist_view(self, request, extra_context=None):
         user = request.user
         if user.is_superuser:

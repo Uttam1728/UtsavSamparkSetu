@@ -32,17 +32,22 @@ def Add_KaryKarGroup(sender, instance, **kwargs):
 class KaryakarProfileAdmin(admin.ModelAdmin):
     
     # change_list_template = 'admin/karykar_change_list.html'
-    list_display = ("__str__","SamparkKarykar1", "SamparkKarykar2","Yuvak_List") # "WhatsApp","Call","SMS","username")
+    list_display = ("__str__","Karykar_1", "Karykar_2","Yuvak_List") # "WhatsApp","Call","SMS","username")
     list_per_page = 20
     autocomplete_fields = ('karykar1profile', 'karykar2profile', 'Yuvaks')
-    search_fields = ('karykar1profile__FirstName__icontains','karykar1profile__SurName__icontains','karykar2profile__FirstName__icontains','karykar2profile__SurName__icontains','Yuvaks__FirstName__icontains','Yuvaks__FirstName__icontains')
+    search_fields = ('karykar1profile__FirstName__icontains',
+                        'karykar1profile__SurName__icontains',
+                        'karykar2profile__FirstName__icontains',
+                        'karykar2profile__SurName__icontains',
+                        'Yuvaks__FirstName__icontains',
+                        'Yuvaks__SurName__icontains')
 
-    def SamparkKarykar1(self,obj):
+    def Karykar_1(self,obj):
         if obj.karykar1profile : 
             return format_html(obj.karykar1profile.FirstName + " " +obj.karykar1profile.SurName +" <br> "+ messageIcons(obj.karykar1profile.WhatsappNo,20,False))
         return ''
 
-    def SamparkKarykar2(self,obj):
+    def Karykar_2(self,obj):
         if obj.karykar2profile : 
             return format_html(obj.karykar2profile.FirstName + " " +obj.karykar2profile.SurName +" <br> "+ messageIcons(obj.karykar2profile.WhatsappNo,20,False))
         return ''
@@ -53,7 +58,12 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
             s += '<li>{} {}</li>'.format(yuvak.FirstName,yuvak.SurName)  #+ messageIcons(yuvak.WhatsappNo,20)
         return format_html(s)
     
-
+    def get_search_fields(self,request):
+        if not request.user.is_superuser:
+            if not is_member(request.user,"Sampark Karykar"):
+                return []
+        return super().get_search_fields(request)
+        
     def get_queryset(self, request):
         qs = super(KaryakarProfileAdmin, self).get_queryset(request) 
         mandal = getMandal(request.user)
@@ -64,12 +74,11 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
         elif is_member(request.user,"Yuvak"):
             return request.user.yuvakprofile.karyakarprofile_set
      
-    def change_view(self, request, object_id, form_url='', extra_context=None):
+    def get_readonly_fields(self, request, obj) :
         if not request.user.is_superuser:
-            self.readonly_fields = ["Yuvaks","karykar1profile","karykar2profile","mandal"]
-        else:
-            self.readonly_fields = []
-        return super().change_view(request, object_id, form_url, extra_context)
+            return ["Yuvaks","karykar1profile","karykar2profile","mandal"]
+        return super().get_readonly_fields(request, obj)
+
 
 # Register your models here.
 admin.site.register(KaryakarProfile,KaryakarProfileAdmin)
