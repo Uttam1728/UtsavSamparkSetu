@@ -18,13 +18,12 @@ class MandalProfile(models.Model):
 
 class Karyakram(models.Model):
     Title = models.CharField(max_length=1000)
-    is_active = models.BooleanField(default=False)
-    Start_date = models.DateTimeField(blank=True,null=True)
-    End_date = models.DateTimeField(blank=True,null=True)
+    Start_date = models.DateTimeField(blank=True,null=True,verbose_name="Followup Start Date")
+    End_date = models.DateTimeField(blank=True,null=True,verbose_name="Followup End Date")
     Karyakram_date=models.DateTimeField(blank=True,null=True)
     Mandal = models.ForeignKey(MandalProfile,blank=True,null=True,on_delete=models.CASCADE)
-    For_All = models.BooleanField(default=False)
-    
+    Start_Folloup = models.BooleanField(default=False)
+    Start_Attandance = models.BooleanField(default=False)
     def __str__(self):
         return self.Title
 

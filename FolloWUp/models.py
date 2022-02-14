@@ -20,7 +20,7 @@ class FollowupStatus(IntEnum) :
     No = 3,
     InProgress = 4
 
-class PreentStatus(IntEnum):
+class ComingStatus(IntEnum):
     Not_Sure = 1
     Yes = 2
     No = 3
@@ -42,9 +42,11 @@ class FollowUp(models.Model):
                 choices=[(status.value, status.name) for status in FollowupStatus]  # Choices is a list of Tuple
              )
     Coming = models.IntegerField(
-                choices=[(statis.value, statis.name) for statis in PreentStatus]  # Choices is a list of Tuple
+                choices=[(statis.value, statis.name) for statis in ComingStatus]  # Choices is a list of Tuple
                 ,blank=True,null=True
              )
+    Present = models.BooleanField(blank=True,null=True)
+
 
     def __str__(self):
         return self.Karyakram.__str__()

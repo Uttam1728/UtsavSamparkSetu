@@ -21,11 +21,15 @@ from django.conf.urls.static import static
 
 from django.conf import settings
 
+from FolloWUp import views
+
+
 admin.site.site_header = 'Utsav Sampark Setu'
 admin.site.site_title = 'Utsav Sampark Setu'
 admin.site.enable_nav_sidebar = False
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('mark_present', views.mark_attandance)
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

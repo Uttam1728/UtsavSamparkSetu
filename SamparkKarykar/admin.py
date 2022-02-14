@@ -32,7 +32,7 @@ def Add_KaryKarGroup(sender, instance, **kwargs):
 class KaryakarProfileAdmin(admin.ModelAdmin):
     
     # change_list_template = 'admin/karykar_change_list.html'
-    list_display = ("__str__","Karykar_1", "Karykar_2","Yuvak_List") # "WhatsApp","Call","SMS","username")
+    list_display = ("__str__","Karykar_1", "Karykar_2","Yuvak_List") 
     list_per_page = 20
     autocomplete_fields = ('karykar1profile', 'karykar2profile', 'Yuvaks')
     search_fields = ('karykar1profile__FirstName__icontains',
@@ -57,7 +57,8 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
         for yuvak in obj.Yuvaks.all():
             s += '<li>{} {}</li>'.format(yuvak.FirstName,yuvak.SurName)  #+ messageIcons(yuvak.WhatsappNo,20)
         return format_html(s)
-    
+    Yuvak_List.short_description = "______Yuvak List_______."
+
     def get_search_fields(self,request):
         if not request.user.is_superuser:
             if not is_member(request.user,"Sampark Karykar"):

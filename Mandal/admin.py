@@ -15,29 +15,36 @@ from Yuvak.models import YuvakProfile
 
 class KaryakramAdmin(admin.ModelAdmin):
     change_form_template = "admin/karyakram_change_form.html"
-    list_display = ("__str__", "Karyakram_date", "is_active", "For_All","Start_date","End_date")
+    list_display = ("__str__", "Karyakram_date", "Start_date","End_date","Start_Folloup","Start_Attandance")
     list_per_page = 20
     
     def get_fieldsets(self, request, obj) :
         if not request.user.is_superuser:
-            if not is_member(request.user,"Sampark Karykar"):
-                return ((None, {"fields": ("Title","is_active","Karyakram_date","Mandal")}),)
-        return super().get_fieldsets(request, obj)
+            if is_member(request.user,"Sampark Karykar"):
+                return ((None, {"fields": ("Title","Karyakram_date","Start_date","End_date","Mandal")}),)
+            elif is_member(request.user,"Yuvak"):
+                return ((None, {"fields": ("Title","Karyakram_date","Mandal")}),)
+        else: return ((None, {"fields": ("Title","Karyakram_date","Start_date","End_date","Mandal")}),)
     
 
     def get_queryset(self, request):
-        qs = super(KaryakramAdmin, self).get_queryset(request)
-        return qs.filter(Mandal=getMandal(request.user)).order_by('-Karyakram_date')
+        qs = super(KaryakramAdmin, self).get_queryset(request).filter(Mandal=getMandal(request.user)).order_by('-Karyakram_date')
+        if not request.user.is_superuser:
+            return qs.filter(Start_Folloup=True)
+        return qs
 
     def get_list_display(self,request):
         if not request.user.is_superuser:
-            if not is_member(request.user,"Sampark Karykar"):
-                return ["__str__", "Karyakram_date", "is_active",]
+            if is_member(request.user,"Sampark Karykar"):
+                return ["__str__", "Karyakram_date","Start_date","End_date","Start_Folloup"]
+            elif is_member(request.user,"Yuvak"):
+                return ["__str__", "Karyakram_date"]
         return super().get_list_display(request)
    
     def save_model(self, request, obj, form, change):
         if "_followup_record_create" in request.POST:
             if obj.pk:
+                Karyakram.objects.filter(pk=obj.pk).update(Start_Folloup=True)
                 for karyakar_vrund in obj.Mandal.karyakarprofile_set.all():
                     for yuvak in karyakar_vrund.Yuvaks.all():
                         FollowUp.objects.get_or_create(Karyakram=obj,

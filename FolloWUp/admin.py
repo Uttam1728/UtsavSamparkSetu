@@ -1,6 +1,7 @@
+import html
 from django.contrib import admin
 from Common.util import getMandal, is_member, messageIcons
-from FolloWUp.models import FollowUp,FollowupStatus, PreentStatus
+from FolloWUp.models import FollowUp,FollowupStatus, ComingStatus
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
@@ -28,7 +29,7 @@ class FollowUpAdminForm(forms.ModelForm):
             raise forms.ValidationError("Coming Status Required! Please Add it") 
         if cleaned_data['Status'] != FollowupStatus.Done:
             raise forms.ValidationError("Status is not selected as Done, please select!")
-        if cleaned_data['Coming'] != PreentStatus.Yes :
+        if cleaned_data['Coming'] != ComingStatus.Yes :
             if  cleaned_data["Remark"] is None or cleaned_data["Remark"] == "":
                 raise forms.ValidationError("Remark Required! Please Add it")   
 
@@ -40,11 +41,17 @@ class FollowUpAdmin(admin.ModelAdmin):
     fieldsets = ((None, {"fields": ("Karyakram","KaryKarVrund","Yuvak","Status","Coming","How","Remark")}),)
     list_per_page = 25
     form = FollowUpAdminForm
-    
+    search_fields = ('KaryKarVrund__karykar1profile__FirstName__icontains',
+                        'KaryKarVrund__karykar1profile__SurName__icontains',
+                        'KaryKarVrund__karykar2profile__FirstName__icontains',
+                        'KaryKarVrund__karykar2profile__SurName__icontains',
+                        'KaryKarVrund__Yuvaks__FirstName__icontains',
+                        'KaryKarVrund__Yuvaks__SurName__icontains') 
     
     def YuvakName(self,obj):
         return format_html(obj.Yuvak.FirstName + " " +obj.Yuvak.SurName +" <br> "+ messageIcons(obj.Yuvak.WhatsappNo,20,False))
-        
+    YuvakName.short_description = "______Yuvak Name_______."
+    
     def Karykar_Names(self,obj):
         s= ''
         if obj.KaryKarVrund.karykar1profile:
@@ -52,18 +59,19 @@ class FollowUpAdmin(admin.ModelAdmin):
         if obj.KaryKarVrund.karykar2profile:
             s += '<li>{} {}</li>'.format(obj.KaryKarVrund.karykar2profile.FirstName,obj.KaryKarVrund.karykar2profile.SurName)
         return format_html(s)
-    
+    Karykar_Names.short_description = "______Karykar Names_______."
+
     def StatusWithColor(self,obj):
         return format_html("<button style='color: black;border-radius: 5px;padding-top: 3px;border: none;background: {};'><b>{}</b></button>".format(color[obj.Status][0],color[obj.Status][1]))
     StatusWithColor.short_description = "Status"
     
     def ComingLogo(self,obj):
         if obj.Status == FollowupStatus.Done:
-            if obj.Coming == PreentStatus.Yes:
+            if obj.Coming == ComingStatus.Yes:
                 return format_html('<img src="/static/admin/img/icon-yes.svg" alt="Yes">')
-            elif obj.Coming == PreentStatus.No:
+            elif obj.Coming == ComingStatus.No:
                 return format_html('<img src="/static/admin/img/icon-no.svg" alt="No">'+"-"+obj.Remark)
-            elif obj.Coming == PreentStatus.Not_Sure:
+            elif obj.Coming == ComingStatus.Not_Sure:
                 return format_html('<img src="/static/admin/img/icon-unknown.svg" alt="Not Sure">'+"-"+ obj.Remark)
             
         return ""
@@ -112,17 +120,80 @@ class FollowUpAdmin(admin.ModelAdmin):
         if not request.user.is_superuser:
             return [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,]
         return super().get_list_filter(request)
-        
-    def changelist_view(self, request, extra_context=None):
-        user = request.user
-        if user.is_superuser:
-            # self.list_filter.insert(1,KarykarDropdownFilter)
-            pass
-        elif is_member(request.user,"Sampark Karykar"):
-             if KarykarDropdownFilter in self.list_filter : 
-                self.list_filter.remove(KarykarDropdownFilter)
-        return super(FollowUpAdmin, self).changelist_view(request, extra_context=None)
 
-   
+    def get_search_fields(self,request):
+        if not request.user.is_superuser:
+            if not is_member(request.user,"Sampark Karykar"):
+                return []
+        return super().get_search_fields(request)  
+
+class Attandance(FollowUp):
+    
+    class Meta:
+        proxy=True
+        verbose_name = "Attandance"
+        verbose_name_plural = "Attandance"
+
+class AttandanceAdmin(FollowUpAdmin):
+    list_display = ("Karyakram","YuvakName","Present", "StatusWithColor","Feedback","How","Karykar_Names")
+    fieldsets = ((None, {"fields": ("Karyakram","KaryKarVrund","Yuvak","Status","Coming","How","Remark","Present")}),)
+    list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,KarykarDropdownFilter,"Present"]
+    actions = []
+    list_display_links = None 
+    search_fields = ('KaryKarVrund__karykar1profile__FirstName__icontains',
+                        'KaryKarVrund__karykar1profile__SurName__icontains',
+                        'KaryKarVrund__karykar2profile__FirstName__icontains',
+                        'KaryKarVrund__karykar2profile__SurName__icontains',
+                        'KaryKarVrund__Yuvaks__FirstName__icontains',
+                        'KaryKarVrund__Yuvaks__SurName__icontains') 
+    def Karyakram_name(self,obj):
+        return obj.Karyakram.__str__()
+
+    def StatusWithColor(self,obj):
+        return format_html("<button style='color: black;border-radius: 5px;padding-top: 3px;border: none;background: {};'><b>{}</b></button>".format(color[obj.Status][0],color[obj.Status][1]))
+    StatusWithColor.short_description = "FolloUp"
+    
+    def Feedback(self,obj):
+        if obj.Status == FollowupStatus.Done:
+            if obj.Coming == ComingStatus.Yes:
+                return format_html('<img src="/static/admin/img/icon-yes.svg" alt="Yes">')
+            elif obj.Coming == ComingStatus.No:
+                return format_html('<img src="/static/admin/img/icon-no.svg" alt="No">'+"-"+obj.Remark)
+            elif obj.Coming == ComingStatus.Not_Sure:
+                return format_html('<img src="/static/admin/img/icon-unknown.svg" alt="Not Sure">'+"-"+ obj.Remark)
+            
+        return ""
+
+    def PresentButton(self,obj):
+        url = '/mark_present?followup={}&yuvak={}&present={}&parent={}'.format(obj.pk,obj.Yuvak_id,not obj.Present,html.unescape(self.request.build_absolute_uri()))
+        button = format_html(
+            '<a type="button" class="button button_preview" id="_sub_preview" href="{url}" >&nbsp;{P_A}&nbsp;</a>',
+            url=url,P_A = 'A' if obj.Present else 'P'
+        )
+        return button
+    PresentButton.short_description= ""
+
+    def get_list_display(self,request):
+        if request.user.is_superuser:
+            return ('PresentButton',) + super().get_list_display(request)
+        return super().get_list_display(request)
+
+    def get_queryset(self, request):
+        self.request = request
+        qs = super(AttandanceAdmin, self).get_queryset(request).order_by('-Karyakram__Karyakram_date')
+        return qs.filter(Karyakram__Start_Attandance=True)
+        
+    def get_search_fields(self,request):
+        if not request.user.is_superuser:
+            if not is_member(request.user,"Sampark Karykar"):
+                return []
+        return super().get_search_fields(request)
+
+    def get_list_filter(self,request):
+        if not request.user.is_superuser:
+            if not is_member(request.user,"Sampark Karykar"):
+                return []
+        return super().get_list_filter(request)
 
 admin.site.register(FollowUp,FollowUpAdmin)
+admin.site.register(Attandance,AttandanceAdmin)
