@@ -24,6 +24,7 @@ class Karyakram(models.Model):
     Mandal = models.ForeignKey(MandalProfile,blank=True,null=True,on_delete=models.CASCADE)
     Start_Folloup = models.BooleanField(default=False)
     Start_Attandance = models.BooleanField(default=False)
+    IsDone = models.BooleanField(default=False)
     def __str__(self):
         return self.Title
 

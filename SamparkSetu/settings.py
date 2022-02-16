@@ -81,35 +81,35 @@ WSGI_APPLICATION = 'SamparkSetu.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'TestSamparkSetu',
-
-#         'USER': 'postgres',
-
-#         'PASSWORD': '1234',
-
-#         'HOST': 'localhost',
-
-#         'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd63fk4spg2t51q',
+        'NAME': 'TestSamparkSetu',
 
-        'USER': 'snfagitiajhaji',
+        'USER': 'postgres',
 
-        'PASSWORD': '084084fac263eb7757a38c90dd965707205524ee002338abee8140daa803aba8',
+        'PASSWORD': '1234',
 
-        'HOST': 'ec2-184-73-243-101.compute-1.amazonaws.com',
+        'HOST': 'localhost',
 
         'PORT': '5432',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'd63fk4spg2t51q',
+
+#         'USER': 'snfagitiajhaji',
+
+#         'PASSWORD': '084084fac263eb7757a38c90dd965707205524ee002338abee8140daa803aba8',
+
+#         'HOST': 'ec2-184-73-243-101.compute-1.amazonaws.com',
+
+#         'PORT': '5432',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -124,12 +124,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_L10N = True
 
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

@@ -1,21 +1,21 @@
-from urllib import request
+
 from django.contrib import admin
-from Common.util import getMandal, is_member,is_followUpDone, messageIcons
-from datetime import date, datetime
-from django.db.models import Q
+from Common.util import getMandal, is_member, messageIcons
+
 from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from FolloWUp.models import FollowUp, FollowupStatus
 from Mandal.models import Karyakram, MandalProfile
+from SamparkKarykar.models import KaryakarProfile
 from Yuvak.models import YuvakProfile
 
 # Register your models here.
 
 class KaryakramAdmin(admin.ModelAdmin):
     change_form_template = "admin/karyakram_change_form.html"
-    list_display = ("__str__", "Karyakram_date", "Start_date","End_date","Start_Folloup","Start_Attandance")
+    list_display = ("__str__", "Karyakram_date", "Start_date","End_date","Start_Folloup","Start_Attandance","IsDone")
     list_per_page = 20
     
     def get_fieldsets(self, request, obj) :
@@ -42,14 +42,48 @@ class KaryakramAdmin(admin.ModelAdmin):
         return super().get_list_display(request)
    
     def save_model(self, request, obj, form, change):
-        if "_followup_record_create" in request.POST:
+        if "_followup_record_create" in request.POST or "_attandance_record_create" in request.POST or "_done_karykram" in request.POST:
             if obj.pk:
-                Karyakram.objects.filter(pk=obj.pk).update(Start_Folloup=True)
-                for karyakar_vrund in obj.Mandal.karyakarprofile_set.all():
-                    for yuvak in karyakar_vrund.Yuvaks.all():
-                        FollowUp.objects.get_or_create(Karyakram=obj,
+                if "_followup_record_create" in request.POST:
+                    for karyakar_vrund in obj.Mandal.karyakarprofile_set.all():
+                        for yuvak in karyakar_vrund.Yuvaks.all():
+                            FollowUp.objects.get_or_create(Karyakram=obj,
+                                            KaryKarVrund=karyakar_vrund,
+                                            Yuvak=yuvak)
+                    Karyakram.objects.filter(pk=obj.pk).update(Start_Folloup=True)
+                    Mandal=getMandal(request.user)
+                    Yuvaks = YuvakProfile.objects.filter(karyakarprofile__isnull=True,mandal=Mandal)
+                    karyakar_vrund = KaryakarProfile.objects.filter(mandal=Mandal,karykar1profile__FirstName="Admin",karykar1profile__MiddleName=Mandal.Name,karykar1profile__SurName="Mandal").first()
+                    if karyakar_vrund:
+                        for yuvak in Yuvaks.all():
+                            FollowUp.objects.get_or_create(Karyakram=obj,
                                         KaryKarVrund=karyakar_vrund,
                                         Yuvak=yuvak)
+                        
+                elif "_attandance_record_create" in request.POST:
+                    if obj.Start_Folloup == True:
+                        Mandal=getMandal(request.user)
+                        Yuvaks = YuvakProfile.objects.filter(karyakarprofile__isnull=True,mandal=Mandal)
+                        karyakar_vrund = KaryakarProfile.objects.filter(mandal=Mandal,karykar1profile__FirstName="Admin",karykar1profile__MiddleName=Mandal.Name,karykar1profile__SurName="Mandal").first()
+                        if karyakar_vrund:
+                            for yuvak in Yuvaks.all():
+                                FollowUp.objects.get_or_create(Karyakram=obj,
+                                            KaryKarVrund=karyakar_vrund,
+                                            Yuvak=yuvak)
+                            Karyakram.objects.filter(pk=obj.pk).update(Start_Attandance=True)
+                        else:
+                            msg = format_html(_('Please Create Admin User first Initiate FollowUp first.'))
+                            self.message_user(request, msg, messages.WARNING)
+                            return HttpResponseRedirect("/admin/Mandal/karyakram")
+                    else:
+                        msg = format_html(_('Please Initiate FollowUp first.'))
+                        self.message_user(request, msg, messages.WARNING)
+                        return HttpResponseRedirect("/admin/Mandal/karyakram")
+                elif "_done_karykram" in request.POST:
+                    FollowUp.objects.filter(Karyakram=obj,Status=FollowupStatus.Pending).update(Status=FollowupStatus.No)
+                    FollowUp.objects.filter(Karyakram=obj,Present__isnull=True).update(Present=False)
+                    Karyakram.objects.filter(pk=obj.pk).update(IsDone=True)   
+            
             else:
                 msg = format_html(_('Please save karykram first.'))
                 self.message_user(request, msg, messages.WARNING)

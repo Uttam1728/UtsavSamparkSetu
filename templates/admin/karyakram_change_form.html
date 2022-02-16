@@ -5,7 +5,10 @@
     {{ block.super }}
     {% if request.user.is_superuser %}
     <div class="submit-row">
+        
         <input type="submit" value="Initiate FollowUp" name="_followup_record_create">
+        <input type="submit" value="Initiate Attandance" name="_attandance_record_create">
+        <input type="submit" value="Done KaryaKram" name="_done_karykram">
     </div>
     {% endif %}
 {% endblock %}

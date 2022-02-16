@@ -1,3 +1,5 @@
+from functools import reduce
+from operator import or_
 from django.urls import reverse
 from django.contrib import admin
 
@@ -160,7 +162,22 @@ class YuvakProfileAdmin(admin.ModelAdmin):
             queryset =queryset.filter(karyakarprofile__isnull=True).all()
         elif type in ['karykar2profile', 'karykar1profile']:
             queryset = queryset.exclude(Q(Profile1Info__isnull=False) | Q(Profile2Info__isnull=False)).all()
-        return super().get_search_results(request, queryset, search_term)
+        
+
+        orig_queryset = queryset
+        queryset, use_distinct = super(YuvakProfileAdmin, self).get_search_results(
+                                               request, queryset, search_term)
+        search_words = search_term.split(',')
+        if search_words:
+            q_objects = [Q(**{field : word})
+                                for field in self.search_fields
+                                for word in search_words]
+
+            queryset |= self.model.objects.filter(reduce(or_, q_objects))
+
+        queryset = queryset & orig_queryset
+
+        return queryset, use_distinct
 
 class UserAdmin(AuthUserAdmin):
     list_per_page = 20
@@ -205,7 +222,7 @@ class UserAdmin(AuthUserAdmin):
         return super().get_readonly_fields(request, obj)
 
 class SatsangProfileAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "Profile_Completion","WhatsApp","Call","SMS",)
+    list_display = ("SatsangiWithLogo", "Profile_Completion","WhatsApp","Call","SMS",)
     fieldsets = ((None, {"fields": (("NityaPuja","NityaPujaYear"),
     ("TilakChandlo","TilakChandloYear"),
     ("Satsangi","SatsangiYear"),
@@ -219,6 +236,14 @@ class SatsangProfileAdmin(admin.ModelAdmin):
     list_per_page = 20
     search_fields = ('yuvakProfile__FirstName__icontains','yuvakProfile__SurName__icontains')
     
+
+    def SatsangiWithLogo(self,obj):
+        s = obj.yuvakProfile.__str__()
+        if obj.yuvakProfile.karyakarprofile_set.exists():
+            s += ' <img src="/static/admin/img/icon-yes.svg" alt="Yes">'
+        return format_html(s)
+    SatsangiWithLogo.short_description = "Satsangi"    
+
     def WhatsApp(self,obj):
         buttons = ''
         buttons += "<a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(obj.yuvakProfile.WhatsappNo)

@@ -7,15 +7,25 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.html import format_html
 from Common.filters import KarykarDropdownFilter,HowDropdownFilter, StatusDropdownFilter, KarykramDropdownFilter
-from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect
-from django.contrib import messages
 from django import forms
 # Register your models here.
 
 color= {FollowupStatus.Pending: ("lightgoldenrodyellow","Pending"),
 FollowupStatus.Done:("darkseagreen","Done"),
 FollowupStatus.No:("indianred","No")}
+
+class FeedbackFilter(admin.SimpleListFilter):
+    title = 'Feedback'
+    parameter_name = 'feedback'
+
+    def lookups(self, request, model_admin):
+        return tuple((statis.value, statis.name) for statis in ComingStatus)
+
+    def queryset(self, request, queryset):
+        feedback = self.value()
+        if feedback is None:
+            return queryset
+        return queryset.filter(Coming = feedback)
 
 class FollowUpAdminForm(forms.ModelForm):
     class Meta:
@@ -105,9 +115,9 @@ class FollowUpAdmin(admin.ModelAdmin):
             return qs.filter(Karyakram__Mandal=getMandal(user))
         elif is_member(user,"Sampark Karykar"):
             try:
-                return qs.filter(Q(KaryKarVrund=request.user.yuvakprofile.Profile1Info))
+                return qs.filter(Q(KaryKarVrund=request.user.yuvakprofile.Profile1Info) | Q(Yuvak__user=user)) 
             except ObjectDoesNotExist  :
-                return qs.filter(Q(KaryKarVrund=request.user.yuvakprofile.Profile2Info))
+                return qs.filter(Q(KaryKarVrund=request.user.yuvakprofile.Profile2Info) | Q(Yuvak__user=user))
         elif is_member(user,"Yuvak"):
             return qs.filter(Yuvak__user=user)
     
@@ -116,6 +126,12 @@ class FollowUpAdmin(admin.ModelAdmin):
             return  ["KaryKarVrund","Yuvak","Karyakram"]
         return super().get_readonly_fields(request, obj)
     
+    def has_change_permission(self, request, obj=None):
+        if not request.user.is_superuser:
+            if obj and obj.Karyakram.IsDone:
+                return False
+        return super().has_change_permission(request,obj)
+
     def get_list_filter(self,request):
         if not request.user.is_superuser:
             return [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,]
@@ -127,6 +143,8 @@ class FollowUpAdmin(admin.ModelAdmin):
                 return []
         return super().get_search_fields(request)  
 
+
+
 class Attandance(FollowUp):
     
     class Meta:
@@ -135,17 +153,19 @@ class Attandance(FollowUp):
         verbose_name_plural = "Attandance"
 
 class AttandanceAdmin(FollowUpAdmin):
-    list_display = ("Karyakram","YuvakName","Present", "StatusWithColor","Feedback","How","Karykar_Names")
+    list_display = ("Karyakram","QR","YuvakName","Present", "StatusWithColor","Feedback","How","Karykar_Names")
     fieldsets = ((None, {"fields": ("Karyakram","KaryKarVrund","Yuvak","Status","Coming","How","Remark","Present")}),)
-    list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,KarykarDropdownFilter,"Present"]
+    list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,KarykarDropdownFilter,"Present",FeedbackFilter]
     actions = []
     list_display_links = None 
-    search_fields = ('KaryKarVrund__karykar1profile__FirstName__icontains',
+    search_fields = (
+                    'KaryKarVrund__karykar1profile__FirstName__icontains',
                         'KaryKarVrund__karykar1profile__SurName__icontains',
                         'KaryKarVrund__karykar2profile__FirstName__icontains',
                         'KaryKarVrund__karykar2profile__SurName__icontains',
-                        'KaryKarVrund__Yuvaks__FirstName__icontains',
-                        'KaryKarVrund__Yuvaks__SurName__icontains') 
+                        'Yuvak__FirstName__icontains',
+                        'Yuvak__SurName__icontains')  
+    change_list_template = "admin/attandance_change_list.html"
     def Karyakram_name(self,obj):
         return obj.Karyakram.__str__()
 
@@ -158,9 +178,9 @@ class AttandanceAdmin(FollowUpAdmin):
             if obj.Coming == ComingStatus.Yes:
                 return format_html('<img src="/static/admin/img/icon-yes.svg" alt="Yes">')
             elif obj.Coming == ComingStatus.No:
-                return format_html('<img src="/static/admin/img/icon-no.svg" alt="No">'+"-"+obj.Remark)
+                return format_html('<img src="/static/admin/img/icon-no.svg" alt="No">'+" - "+obj.Remark)
             elif obj.Coming == ComingStatus.Not_Sure:
-                return format_html('<img src="/static/admin/img/icon-unknown.svg" alt="Not Sure">'+"-"+ obj.Remark)
+                return format_html('<img src="/static/admin/img/icon-unknown.svg" alt="Not Sure">'+" - "+ obj.Remark)
             
         return ""
 
@@ -172,6 +192,17 @@ class AttandanceAdmin(FollowUpAdmin):
         )
         return button
     PresentButton.short_description= ""
+
+
+    def QR(self,obj):
+        if not self.request.user.is_superuser:
+            if not obj.Karyakram.IsDone:
+                if is_member(self.request.user,"Yuvak") and self.request.user.yuvakprofile == obj.Yuvak:
+                    # if obj.Karyakram
+                    url = self.request.get_host() + '/mark_present?followup={}&yuvak={}&present={}&parent={}'.format(obj.pk,obj.Yuvak_id,not obj.Present,html.unescape(self.request.build_absolute_uri()))
+                    return format_html('<div id="qrcode" value={} ></div>'.format(url))
+        return ""
+    QR.short_description= ""
 
     def get_list_display(self,request):
         if request.user.is_superuser:
@@ -194,6 +225,7 @@ class AttandanceAdmin(FollowUpAdmin):
             if not is_member(request.user,"Sampark Karykar"):
                 return []
         return super().get_list_filter(request)
+
 
 admin.site.register(FollowUp,FollowUpAdmin)
 admin.site.register(Attandance,AttandanceAdmin)
