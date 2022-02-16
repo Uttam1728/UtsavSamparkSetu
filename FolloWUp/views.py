@@ -3,8 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
 from FolloWUp.models import FollowUp
-import cv2
-import webbrowser
+
 
 
 def myview(request):
