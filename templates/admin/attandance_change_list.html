@@ -1,6 +1,7 @@
 {% extends "admin/change_list.html" %}
 {% load i18n  %}
-{% block extrahead %}
+{% block extrahead %} 
+{{block.super }}
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
     
@@ -17,4 +18,10 @@
     })
             
     </script>
+
+{% endblock %}
+
+{% block search %}
+{{block.super }}
+<a  type="button" class="button button_preview"  value="qr_Scan" name="_qr_scan" href="/qr_scan"> QR Scan</a>
 {% endblock %}

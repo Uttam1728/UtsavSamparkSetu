@@ -198,9 +198,9 @@ class AttandanceAdmin(FollowUpAdmin):
         if not self.request.user.is_superuser:
             if not obj.Karyakram.IsDone:
                 if is_member(self.request.user,"Yuvak") and self.request.user.yuvakprofile == obj.Yuvak:
-                    # if obj.Karyakram
-                    url = "https://" +self.request.get_host() + '/mark_present?followup={}&yuvak={}&present={}&parent={}'.format(obj.pk,obj.Yuvak_id,not obj.Present,html.unescape(self.request.build_absolute_uri()))
-                    return format_html('<div id="qrcode" value={} ></div>'.format(url))
+                    if not obj.Present:
+                        url = "https://" +self.request.get_host() + '/mark_present?followup={}&yuvak={}&present={}&parent={}'.format(obj.pk,obj.Yuvak_id,not obj.Present,html.unescape(self.request.build_absolute_uri()))
+                        return format_html('<div id="qrcode" value={} ></div>'.format(url))
         return ""
     QR.short_description= ""
 

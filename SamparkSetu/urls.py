@@ -29,7 +29,8 @@ admin.site.site_title = 'Utsav Sampark Setu'
 admin.site.enable_nav_sidebar = False
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('mark_present', views.mark_attandance)
+    path('mark_present', views.mark_attandance),
+    path('qr_scan',views.qr_scan)
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
