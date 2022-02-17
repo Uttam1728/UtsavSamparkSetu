@@ -8,8 +8,8 @@
             "name": "Python: Django",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\manage.py ",
-            "python": "D:\\Utsav\\scripts\\python.exe",
+            "program": "${workspaceFolder}//manage.py ",
+            "python": "/Users/ushank/SamparkSetu/UtsavSamparkSetu/venv/bin/python",
             
             "args": [
                 "runserver",

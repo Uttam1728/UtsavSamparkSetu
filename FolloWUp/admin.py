@@ -1,5 +1,7 @@
 import html
 from django.contrib import admin
+
+import SamparkKarykar.models
 from Common.util import getMandal, is_member, messageIcons
 from FolloWUp.models import FollowUp,FollowupStatus, ComingStatus
 from django.db.models import Q
@@ -27,6 +29,28 @@ class FeedbackFilter(admin.SimpleListFilter):
             return queryset
         return queryset.filter(Coming = feedback)
 
+class AdminFollowUpFilter(admin.SimpleListFilter):
+    title = 'Admin'
+    parameter_name = 'admin'
+
+    def lookups(self, request, model_admin):
+        return (("withadmin","Admin"),("withoutadmin","Without Admin"))
+
+    def queryset(self, request, queryset):
+        param = self.value()
+        if param is None:
+            return queryset
+        Mandal = getMandal(request.user)
+        karyakar_vrund = SamparkKarykar.models.KaryakarProfile.objects.filter(mandal=Mandal, karykar1profile__FirstName="Admin",
+                                                                       karykar1profile__MiddleName=Mandal.Name,
+                                                                       karykar1profile__SurName="Mandal").first()
+
+        if param == "withadmin":
+            return queryset.filter(KaryKarVrund=karyakar_vrund)
+        elif param == "withoutadmin":
+            return queryset.exclude(KaryKarVrund=karyakar_vrund)
+        return None
+
 class FollowUpAdminForm(forms.ModelForm):
     class Meta:
         model = FollowUp
@@ -47,7 +71,7 @@ class FollowUpAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/followup_change_list.html'
 
     list_display = ("__str__","YuvakName", "StatusWithColor","ComingLogo","How","Karykar_Names")
-    list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,KarykarDropdownFilter]
+    list_filter = [KarykramDropdownFilter,StatusDropdownFilter, HowDropdownFilter,KarykarDropdownFilter,AdminFollowUpFilter]
     fieldsets = ((None, {"fields": ("Karyakram","KaryKarVrund","Yuvak","Status","Coming","How","Remark")}),)
     list_per_page = 25
     form = FollowUpAdminForm
