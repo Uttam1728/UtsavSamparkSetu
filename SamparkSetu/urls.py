@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.shortcuts import redirect
 from django.urls import path
 from django.urls import re_path 
 from django.views.static import serve
@@ -27,7 +28,9 @@ from FolloWUp import views
 admin.site.site_header = 'Utsav Sampark Setu'
 admin.site.site_title = 'Utsav Sampark Setu'
 admin.site.enable_nav_sidebar = False
+admin.site.site_url = None
 urlpatterns = [
+    path('', lambda request: redirect('admin/', permanent=False)),
     path('admin/', admin.site.urls),
     path('mark_present', views.mark_attandance),
     path('qr_scan',views.qr_scan)
