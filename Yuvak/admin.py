@@ -52,7 +52,10 @@ class RoleFilter(admin.SimpleListFilter):
         groupName = self.value()
         if groupName is None:
             return queryset
-        return queryset.filter(user__groups__name=groupName)
+        if queryset.model is YuvakProfile:
+            return queryset.filter(user__groups__name=groupName)
+        elif queryset.model is SatsangProfile:
+            return queryset.filter(yuvakProfile__user__groups__name=groupName)
 
 
 class KaryKarAlloatMentFilter(admin.SimpleListFilter):
@@ -136,7 +139,9 @@ class YuvakProfileAdmin(admin.ModelAdmin):
 
     def get_list_filter(self, request):
         if not request.user.is_superuser:
-            if not is_member(request.user, "Sampark Karykar"):
+            if is_member(request.user, "Sampark Karykar"):
+                return [("DateOfBirth", DateRangeFilter), ]
+            elif is_member(request.user, "Yuvak"):
                 return []
         return super().get_list_filter(request)
 
@@ -248,6 +253,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
                                     )}),)
     list_per_page = 20
     search_fields = ('yuvakProfile__FirstName__icontains', 'yuvakProfile__SurName__icontains')
+    list_filter = [RoleFilter, ]
 
     def SatsangiWithLogo(self, obj):
         s = obj.yuvakProfile.__str__()
@@ -296,6 +302,11 @@ class SatsangProfileAdmin(admin.ModelAdmin):
                 return []
         return super().get_search_fields(request)
 
+    def get_list_filter(self, request):
+        if not request.user.is_superuser:
+            return []
+        return super().get_list_filter(request)
+
     def get_queryset(self, request):
         qs = super(SatsangProfileAdmin, self).get_queryset(request)
         if request.user.is_superuser:
@@ -305,7 +316,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
         elif is_member(request.user, "Sampark Karykar"):
             try:
                 yuvaklist = YuvakProfile.objects.filter(
-                    Q(karyakarprofile=request.user.yuvakprofile.Profile2Info) | Q(pk=request.user.yuvakprofile.pk))
+                    Q(karyakarprofile=request.user.yuvakprofile.Profile1Info) | Q(pk=request.user.yuvakprofile.pk))
             except ObjectDoesNotExist:
                 yuvaklist = YuvakProfile.objects.filter(
                     Q(karyakarprofile=request.user.yuvakprofile.Profile2Info) | Q(pk=request.user.yuvakprofile.pk))
@@ -317,6 +328,23 @@ class SatsangProfileAdmin(admin.ModelAdmin):
         if not request.user.is_superuser:
             return ('yuvakProfile',)
         return super().get_readonly_fields(request, obj)
+
+    def get_search_results(self, request, queryset, search_term):
+
+        orig_queryset = queryset
+        queryset, use_distinct = super(SatsangProfileAdmin, self).get_search_results(
+            request, queryset, search_term)
+        search_words = search_term.split(',')
+        if search_words:
+            q_objects = [Q(**{field: word})
+                         for field in self.search_fields
+                         for word in search_words]
+
+            queryset |= self.model.objects.filter(reduce(or_, q_objects))
+
+        queryset = queryset & orig_queryset
+
+        return queryset, use_distinct
 
 
 admin.site.unregister(User)

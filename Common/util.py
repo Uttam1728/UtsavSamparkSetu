@@ -48,7 +48,7 @@ def Profile_Completion(obj):
         completed += not (value is None or value == '')
     ratio = (completed / len(fields_names)) * 100
 
-    return ratio
+    return int(ratio)
 
 
 def getMandal(user):

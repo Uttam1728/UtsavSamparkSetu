@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.html import format_html
 
-from Common.util import getMandal, is_member, messageIcons
+from Common.util import getMandal, is_member, messageIcons, Profile_Completion
 from SamparkKarykar.models import KaryakarProfile
 
 
@@ -52,10 +52,15 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
     def Yuvak_List(self, obj):
         s = ''
         for yuvak in obj.Yuvaks.all():
-            s += '<li>{} {}</li>'.format(yuvak.FirstName, yuvak.SurName)  # + messageIcons(yuvak.WhatsappNo,20)
+            profile_completion_yuvak = Profile_Completion(yuvak)
+            profile_completion_satsangi = Profile_Completion(yuvak.satsangprofile)
+            s += '<li>{} {} <progress value="{}" style="width:65px" max="100"></progress><span style="font-size:12px"> {}%  </span><progress value="{}" style="width:65px"  max="100"></progress><span style="font-size:12px" > {}%</span></li>'.format(
+                yuvak.FirstName, yuvak.SurName, profile_completion_yuvak,
+                profile_completion_yuvak, profile_completion_satsangi,
+                profile_completion_satsangi)  # + messageIcons(yuvak.WhatsappNo,20)
         return format_html(s)
 
-    Yuvak_List.short_description = "______Yuvak List_______."
+    Yuvak_List.short_description = "___________________________Yuvak List____________________________."
 
     def get_search_fields(self, request):
         if not request.user.is_superuser:

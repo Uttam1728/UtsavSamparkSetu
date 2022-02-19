@@ -1,4 +1,6 @@
 import html
+from functools import reduce
+from operator import or_
 
 from django import forms
 from django.contrib import admin
@@ -83,12 +85,13 @@ class FollowUpAdmin(admin.ModelAdmin):
     fieldsets = ((None, {"fields": ("Karyakram", "KaryKarVrund", "Yuvak", "Status", "Coming", "How", "Remark")}),)
     list_per_page = 25
     form = FollowUpAdminForm
-    search_fields = ('KaryKarVrund__karykar1profile__FirstName__icontains',
-                     'KaryKarVrund__karykar1profile__SurName__icontains',
-                     'KaryKarVrund__karykar2profile__FirstName__icontains',
-                     'KaryKarVrund__karykar2profile__SurName__icontains',
-                     'KaryKarVrund__Yuvaks__FirstName__icontains',
-                     'KaryKarVrund__Yuvaks__SurName__icontains')
+    search_fields = (
+        'KaryKarVrund__karykar1profile__FirstName__icontains',
+        'KaryKarVrund__karykar1profile__SurName__icontains',
+        'KaryKarVrund__karykar2profile__FirstName__icontains',
+        'KaryKarVrund__karykar2profile__SurName__icontains',
+        'Yuvak__FirstName__icontains',
+        'Yuvak__SurName__icontains')
 
     def YuvakName(self, obj):
         return format_html(
@@ -184,6 +187,22 @@ class FollowUpAdmin(admin.ModelAdmin):
                 return []
         return super().get_search_fields(request)
 
+    def get_search_results(self, request, queryset, search_term):
+        orig_queryset = queryset
+        queryset, use_distinct = super(FollowUpAdmin, self).get_search_results(
+            request, queryset, search_term)
+        search_words = search_term.split(',')
+        if search_words:
+            q_objects = [Q(**{field: word})
+                         for field in self.search_fields
+                         for word in search_words]
+
+            queryset |= self.model.objects.filter(reduce(or_, q_objects))
+
+        queryset = queryset & orig_queryset
+
+        return queryset, use_distinct
+
 
 class Attandance(FollowUp):
     class Meta:
@@ -274,7 +293,28 @@ class AttandanceAdmin(FollowUpAdmin):
         if not request.user.is_superuser:
             if not is_member(request.user, "Sampark Karykar"):
                 return []
+        if not request.user.is_superuser:
+            if is_member(request.user, "Sampark Karykar"):
+                return [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, "Present", FeedbackFilter]
+            elif is_member(request.user, "Yuvak"):
+                return []
         return super().get_list_filter(request)
+
+    def get_search_results(self, request, queryset, search_term):
+        orig_queryset = queryset
+        queryset, use_distinct = super(FollowUpAdmin, self).get_search_results(
+            request, queryset, search_term)
+        search_words = search_term.split(',')
+        if search_words:
+            q_objects = [Q(**{field: word})
+                         for field in self.search_fields
+                         for word in search_words]
+
+            queryset |= self.model.objects.filter(reduce(or_, q_objects))
+
+        queryset = queryset & orig_queryset
+
+        return queryset, use_distinct
 
 
 admin.site.register(FollowUp, FollowUpAdmin)
