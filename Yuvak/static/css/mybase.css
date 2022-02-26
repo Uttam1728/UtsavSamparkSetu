@@ -6,7 +6,10 @@
   display: inline;
   margin-left: 100px !important;
 }
-  /* On screens that are 992px or less, set the background color to blue */
+.dcsic_wrapper.has_image .dcsic_current_img{
+display: block;
+}
+  /* On screens that are 766px or less, set the background color to blue */
   @media screen and (max-width: 766px) {
     #guruparampara_1,#guruparampara_2 {
         display: block ;
@@ -15,6 +18,15 @@
         display: block ;
         margin : 0px !important;
       }
+
+      .dcsic_current_img{
+        width: 100px;
+        margin-bottom: 20px !important;
+        height: 100px;
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+       }
   }
   
   .homebg {
@@ -26,3 +38,4 @@
     background-repeat: repeat-y;
     background-position: center center;
 }
+

@@ -1,6 +1,8 @@
 from functools import reduce
 from operator import or_
 
+from client_side_image_cropping import ClientsideCroppingWidget
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.models import Group
@@ -52,10 +54,11 @@ class RoleFilter(admin.SimpleListFilter):
         groupName = self.value()
         if groupName is None:
             return queryset
+        g = Group.objects.filter(name=groupName).first()
         if queryset.model is YuvakProfile:
-            return queryset.filter(user__groups__name=groupName)
+            return queryset.filter(user__groups__in=[g])
         elif queryset.model is SatsangProfile:
-            return queryset.filter(yuvakProfile__user__groups__name=groupName)
+            return queryset.filter(yuvakProfile__user__groups__in=[g])
 
 
 class KaryKarAlloatMentFilter(admin.SimpleListFilter):
@@ -78,12 +81,28 @@ class KaryKarAlloatMentFilter(admin.SimpleListFilter):
             return queryset.filter(karyakarprofile__isnull=True)
 
 
+class YuvakProfileForm(forms.ModelForm):
+    class Meta:
+        model = YuvakProfile
+        fields = '__all__'
+        widgets = {
+            'ProfilePhoto': ClientsideCroppingWidget(
+                width=300,
+                height=300,
+                preview_width=100,
+                preview_height=100,
+            )
+        }
+
+
 class YuvakProfileAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/yuvak_change_list.html'
-    list_display = ("Yuvak", "Profile_Completion", "WhatsApp", "Call", "SMS", "userLink", "Role")
+    form = YuvakProfileForm
+    list_display = ("yuvakimage", "Yuvak", "Profile_Completion", "WhatsApp", "Call", "SMS", "userLink", "Role")
     list_per_page = 20
     list_filter = [RoleFilter, ("DateOfBirth", DateRangeFilter), KaryKarAlloatMentFilter]
     search_fields = ('FirstName__icontains', 'SurName__icontains')
+    list_display_links = ["Yuvak", ]
 
     def Yuvak(self, obj):
         s = obj.__str__()
@@ -130,6 +149,16 @@ class YuvakProfileAdmin(admin.ModelAdmin):
                                          obj.user))
 
     userLink.short_description = "User"
+
+    def yuvakimage(self, obj):
+        if obj.ProfilePhoto:
+            s = '<img src={} hight="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+                obj.ProfilePhoto.url)
+        else:
+            s = '<img  hight="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
+
+    yuvakimage.short_description = ""
 
     def Role(self, obj):
         group_names = []
@@ -193,6 +222,10 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         queryset = queryset & orig_queryset
 
         return queryset, use_distinct
+
+    class Media:
+        css = {'all': ("client_side_image_cropping/croppie.css", "client_side_image_cropping/cropping_widget.css",)}
+        js = ("client_side_image_cropping/croppie.min.js", "client_side_image_cropping/cropping_widget.js",)
 
 
 class UserAdmin(AuthUserAdmin):

@@ -34,9 +34,25 @@ class YuvakProfile(models.Model):
     Education = models.CharField(max_length=100, blank=True, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, )
     mandal = models.ForeignKey(MandalProfile, on_delete=models.CASCADE)
+    ProfilePhoto = models.ImageField(
+        upload_to='media/', blank=True, null=True)
 
     def __str__(self):
         return self.FirstName + " " + self.MiddleName + " " + self.SurName
+
+    def save(self):
+        # if self.ProfilePhoto:
+        #     self.ProfilePhoto = self.compressImage(self.ProfilePhoto)
+        if self.pk:
+
+            yuvak = YuvakProfile.objects.get(pk=self.pk)
+            if yuvak.ProfilePhoto:
+                old_url = yuvak.ProfilePhoto.url.split('/')[-1]
+                new_url = self.ProfilePhoto.url.split('/')[-1]
+                if old_url != new_url:
+                    yuvak.ProfilePhoto.delete(save=False)
+
+        super(YuvakProfile, self).save()
 
 
 class SatsangProfile(models.Model):
