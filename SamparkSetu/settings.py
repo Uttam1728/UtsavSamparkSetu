@@ -10,12 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
-import django_heroku
 from pathlib import Path
+
+import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -28,12 +28,12 @@ DEBUG = True
 MEDIA_URL = '/Photos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "Photos")
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com','drive.google.com']
+ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com', 'drive.google.com']
 
 # Application definition
 
 INSTALLED_APPS = [
-    
+
     'rangefilter',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'SamparkKarykar',
     'Mandal',
     'FolloWUp',
+    'client_side_image_cropping',
 ]
 
 MIDDLEWARE = [
@@ -62,7 +63,7 @@ ROOT_URLCONF = 'SamparkSetu.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates',],
+        'DIRS': ['templates', ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,47 +78,45 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'SamparkSetu.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'TestSamparkSetu',
+#
+#         'USER': 'postgres',
+#
+#         'PASSWORD': '1234',
+#
+#         'HOST': 'localhost',
+#
+#         'PORT': '5432',
+#     }
+# }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'TestSamparkSetu',
+        'NAME': 'd63fk4spg2t51q',
 
-        'USER': 'postgres',
+        'USER': 'snfagitiajhaji',
 
-        'PASSWORD': '1234',
+        'PASSWORD': '084084fac263eb7757a38c90dd965707205524ee002338abee8140daa803aba8',
 
-        'HOST': 'localhost',
+        'HOST': 'ec2-184-73-243-101.compute-1.amazonaws.com',
 
         'PORT': '5432',
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'd63fk4spg2t51q',
-
-#         'USER': 'snfagitiajhaji',
-
-#         'PASSWORD': '084084fac263eb7757a38c90dd965707205524ee002338abee8140daa803aba8',
-
-#         'HOST': 'ec2-184-73-243-101.compute-1.amazonaws.com',
-
-#         'PORT': '5432',
-#     }
-# }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    
-]
 
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -137,7 +136,7 @@ USE_TZ = False
 
 # STATIC_URL = 'static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 django_heroku.settings(locals())
 
@@ -151,5 +150,15 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(BASE_DIR,'Yuvak\static'),
+    os.path.join(BASE_DIR, 'Yuvak\static'),
 )
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_S3_ACCESS_KEY_ID = 'AKIAT7LMKFYQE2NU7K4V'
+
+AWS_S3_SECRET_ACCESS_KEY = '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'
+
+AWS_STORAGE_BUCKET_NAME = "samparksetu"
+
+AWS_QUERYSTRING_AUTH = False
