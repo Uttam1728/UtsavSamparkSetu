@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.forms import DateInput
 from django.urls import reverse
 from django.utils.html import format_html
 from rangefilter.filter import DateRangeFilter
@@ -126,7 +127,8 @@ class YuvakProfileForm(forms.ModelForm):
                 height=300,
                 preview_width=100,
                 preview_height=100,
-            )
+            ),
+            'DateOfBirth': DateInput(attrs={'type': 'date'}),
         }
 
 
