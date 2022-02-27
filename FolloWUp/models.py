@@ -24,7 +24,6 @@ class FollowupStatus(IntEnum):
 
 
 class ComingStatus(IntEnum):
-    Not_Sure = 1
     Yes = 2
     No = 3
 
@@ -34,8 +33,8 @@ class FollowUp(models.Model):
     Karyakram = models.ForeignKey(Karyakram, on_delete=models.CASCADE)
     KaryKarVrund = models.ForeignKey(KaryakarProfile, on_delete=models.CASCADE)
     Yuvak = models.ForeignKey(YuvakProfile, on_delete=models.CASCADE)
-    FollowUp_Time = models.DateTimeField(auto_now_add=True)
-    LastFollowUp_Time = models.DateTimeField(auto_now=True)
+    Attandance_Time = models.DateTimeField(blank=True, null=True)
+    LastFollowUp_Time = models.DateTimeField(blank=True, null=True)
     How = models.IntegerField(
         default=HowMethods.Other,
         choices=[(methods.value, methods.name) for methods in HowMethods]  # Choices is a list of Tuple

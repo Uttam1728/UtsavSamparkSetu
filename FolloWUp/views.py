@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.http import HttpResponseRedirect
 
 from FolloWUp.models import FollowUp
@@ -12,7 +14,7 @@ def mark_attandance(request):
     if request.user.is_superuser:
         followup_id = request.GET.get('followup', 0)
         attandance = request.GET.get('present', False) == "True"
-        FollowUp.objects.filter(pk=followup_id).update(Present=attandance)
+        FollowUp.objects.filter(pk=followup_id).update(Present=attandance, Attandance_Time=datetime.now())
         parent = request.GET.get('parent', 'admin')
         return HttpResponseRedirect(parent)
     return HttpResponseRedirect('admin')

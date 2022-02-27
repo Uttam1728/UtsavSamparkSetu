@@ -1,4 +1,5 @@
 import html
+from datetime import datetime
 from functools import reduce
 from operator import or_
 
@@ -18,6 +19,25 @@ from FolloWUp.models import FollowUp, FollowupStatus, ComingStatus
 color = {FollowupStatus.Pending: ("lightgoldenrodyellow", "Pending"),
          FollowupStatus.Done: ("darkseagreen", "Done"),
          FollowupStatus.No: ("indianred", "No")}
+
+
+class RoleFilter(admin.SimpleListFilter):
+    title = 'Role'
+    parameter_name = 'role'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Sampark Karykar', 'Sampark Karykar'),
+            ('Yuvak', 'Yuvak'),
+        )
+
+    def queryset(self, request, queryset):
+        role = self.value()
+        if role is None:
+            return queryset
+        if role == "Sampark Karykar":
+            return queryset.filter(Q(Yuvak__Profile1Info__isnull=False) | Q(Yuvak__Profile2Info__isnull=False))
+        return queryset
 
 
 class FeedbackFilter(admin.SimpleListFilter):
@@ -79,9 +99,9 @@ class FollowUpAdminForm(forms.ModelForm):
 class FollowUpAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/followup_change_list.html'
 
-    list_display = ("__str__", "YuvakName", "StatusWithColor", "ComingLogo", "How", "Karykar_Names")
-    list_filter = [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, KarykarDropdownFilter,
-                   AdminFollowUpFilter]
+    list_display = ("__str__", "YuvakName", "StatusWithColor", "ComingLogo", "How", "Karykar_Names", "Followup_Time")
+    list_filter = [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, KarykarDropdownFilter, "Present",
+                   AdminFollowUpFilter, RoleFilter, "Coming", "LastFollowUp_Time"]
     fieldsets = ((None, {"fields": ("Karyakram", "KaryKarVrund", "Yuvak", "Status", "Coming", "How", "Remark")}),)
     list_per_page = 25
     form = FollowUpAdminForm
@@ -130,6 +150,9 @@ class FollowUpAdmin(admin.ModelAdmin):
         return ""
 
     ComingLogo.short_description = "Coming?"
+
+    def Followup_Time(selfself, obj):
+        return obj.LastFollowUp_Time if obj.Status == FollowupStatus.Done else " - "
 
     '''
     # actions = ['change_status']
@@ -203,6 +226,11 @@ class FollowUpAdmin(admin.ModelAdmin):
 
         return queryset, use_distinct
 
+    def save_model(self, request, obj, form, change):
+        obj.LastFollowUp_Time = datetime.now()
+
+        return super().save_model(request, obj, form, change)
+
 
 class Attandance(FollowUp):
     class Meta:
@@ -212,11 +240,12 @@ class Attandance(FollowUp):
 
 
 class AttandanceAdmin(FollowUpAdmin):
-    list_display = ("Karyakram", "QR", "YuvakName", "Present", "StatusWithColor", "Feedback", "How", "Karykar_Names")
+    list_display = (
+        "Karyakram", "QR", "YuvakName", "Present", "StatusWithColor", "Feedback", "How", "Karykar_Names", "Entry_Time")
     fieldsets = (
         (None, {"fields": ("Karyakram", "KaryKarVrund", "Yuvak", "Status", "Coming", "How", "Remark", "Present")}),)
     list_filter = [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, KarykarDropdownFilter, "Present",
-                   FeedbackFilter]
+                   FeedbackFilter, RoleFilter]
     actions = []
     list_display_links = None
     search_fields = (
@@ -272,6 +301,9 @@ class AttandanceAdmin(FollowUpAdmin):
         return ""
 
     QR.short_description = ""
+
+    def Entry_Time(selfself, obj):
+        return obj.Attandance_Time if obj.Present else " - "
 
     def get_list_display(self, request):
         if request.user.is_superuser:

@@ -51,14 +51,49 @@ class RoleFilter(admin.SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
-        groupName = self.value()
-        if groupName is None:
+        role = self.value()
+        if role is None:
             return queryset
-        g = Group.objects.filter(name=groupName).first()
+        if role == "Sampark Karykar":
+            if queryset.model is YuvakProfile:
+                return queryset.filter(Q(Profile1Info__isnull=False) | Q(Profile2Info__isnull=False))
+            elif queryset.model is SatsangProfile:
+                return queryset.filter(
+                    Q(yuvakProfile__Profile1Info__isnull=False) | Q(yuvakProfile__Profile2Info__isnull=False))
+        return queryset
+
+
+class ProgresBarFilter(admin.SimpleListFilter):
+    title = 'Profile Completion Above'
+    parameter_name = 'ratio'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('25', '25%'),
+            ('50', '50%'),
+            ('75', '75%'),
+            ('80', '80%'),
+            ('90', '90%')
+        )
+
+    def queryset(self, request, queryset):
+        ratio = self.value()
+        if ratio is None:
+            return queryset
         if queryset.model is YuvakProfile:
-            return queryset.filter(user__groups__in=[g])
+            yuvaklist = []
+            all_yuvaks = queryset.all()
+            for yuvak in all_yuvaks:
+                if Profile_Completion(yuvak) > int(ratio):
+                    yuvaklist.append(yuvak.pk)
+            return queryset.filter(id__in=yuvaklist)
         elif queryset.model is SatsangProfile:
-            return queryset.filter(yuvakProfile__user__groups__in=[g])
+            satsangilist = []
+            all_satsangi = queryset.all()
+            for satsangi in all_satsangi:
+                if Profile_Completion(satsangi) > int(ratio):
+                    satsangilist.append(satsangi.pk)
+            return queryset.filter(id__in=satsangilist)
 
 
 class KaryKarAlloatMentFilter(admin.SimpleListFilter):
@@ -100,7 +135,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     form = YuvakProfileForm
     list_display = ("yuvakimage", "Yuvak", "Profile_Completion", "WhatsApp", "Call", "SMS", "userLink", "Role")
     list_per_page = 20
-    list_filter = [RoleFilter, ("DateOfBirth", DateRangeFilter), KaryKarAlloatMentFilter]
+    list_filter = [RoleFilter, ("DateOfBirth", DateRangeFilter), KaryKarAlloatMentFilter, ProgresBarFilter]
     search_fields = ('FirstName__icontains', 'SurName__icontains')
     list_display_links = ["Yuvak", ]
 
@@ -169,16 +204,14 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     def get_list_filter(self, request):
         if not request.user.is_superuser:
             if is_member(request.user, "Sampark Karykar"):
-                return [("DateOfBirth", DateRangeFilter), ]
+                return [("DateOfBirth", DateRangeFilter), ProgresBarFilter]
             elif is_member(request.user, "Yuvak"):
                 return []
         return super().get_list_filter(request)
 
     def get_search_fields(self, request):
         if not request.user.is_superuser:
-            if is_member(request.user, "Sampark Karykar"):
-                return [RoleFilter, ("DateOfBirth", DateRangeFilter)]
-            elif is_member(request.user, "Yuvak"):
+            if not is_member(request.user, "Sampark Karykar"):
                 return []
         return super().get_search_fields(request)
 
@@ -286,7 +319,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
                                     )}),)
     list_per_page = 20
     search_fields = ('yuvakProfile__FirstName__icontains', 'yuvakProfile__SurName__icontains')
-    list_filter = [RoleFilter, ]
+    list_filter = [RoleFilter, ProgresBarFilter]
 
     def SatsangiWithLogo(self, obj):
         s = obj.yuvakProfile.__str__()
@@ -337,7 +370,10 @@ class SatsangProfileAdmin(admin.ModelAdmin):
 
     def get_list_filter(self, request):
         if not request.user.is_superuser:
-            return []
+            if is_member(request.user, "Sampark Karykar"):
+                return [ProgresBarFilter, ]
+            elif is_member(request.user, "Yuvak"):
+                return []
         return super().get_list_filter(request)
 
     def get_queryset(self, request):

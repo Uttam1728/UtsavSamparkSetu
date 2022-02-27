@@ -29,6 +29,7 @@ class Karyakram(models.Model):
     Start_Folloup = models.BooleanField(default=False)
     Start_Attandance = models.BooleanField(default=False)
     IsDone = models.BooleanField(default=False)
+    Only_Karykar = models.BooleanField(default=False)
 
     def __str__(self):
         return self.Title
