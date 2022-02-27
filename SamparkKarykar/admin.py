@@ -25,7 +25,7 @@ def Add_KaryKarGroup(sender, instance, **kwargs):
 
 class KaryakarProfileAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/karykar_change_list.html'
-    list_display = ("__str__", "Karykar_1", "Karykar_2", "Yuvak_List")
+    list_display = ("__str__", "Karykar_1_image", "Karykar_1", "Karykar_2_image", "Karykar_2", "Yuvak_List")
     list_per_page = 20
     autocomplete_fields = ('karykar1profile', 'karykar2profile', 'Yuvaks')
     search_fields = ('karykar1profile__FirstName__icontains',
@@ -42,12 +42,33 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
                     obj.karykar1profile.WhatsappNo, 20, False))
         return ''
 
+    def Karykar_1_image(self, obj):
+        if obj.karykar1profile and obj.karykar1profile.ProfilePhoto:
+            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+                obj.karykar1profile.ProfilePhoto.url)
+        else:
+            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
+
+    Karykar_1_image.short_description = ""
+
     def Karykar_2(self, obj):
         if obj.karykar2profile:
             return format_html(
                 obj.karykar2profile.FirstName + " " + obj.karykar2profile.SurName + " <br> " + messageIcons(
                     obj.karykar2profile.WhatsappNo, 20, False))
         return ''
+
+    def Karykar_2_image(self, obj):
+        if obj.karykar2profile and obj.karykar2profile.ProfilePhoto:
+            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" ' \
+                'alt="profilepic"/></div>'.format(
+                obj.karykar2profile.ProfilePhoto.url)
+        else:
+            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
+
+    Karykar_2_image.short_description = ""
 
     def Yuvak_List(self, obj):
         s = ''

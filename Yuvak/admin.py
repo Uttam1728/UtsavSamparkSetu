@@ -187,10 +187,10 @@ class YuvakProfileAdmin(admin.ModelAdmin):
 
     def yuvakimage(self, obj):
         if obj.ProfilePhoto:
-            s = '<img src={} hight="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
                 obj.ProfilePhoto.url)
         else:
-            s = '<img  hight="80px" width="80px" src="/static/img/yuvak.png" >'
+            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
         return format_html(s)
 
     yuvakimage.short_description = ""
@@ -306,7 +306,7 @@ class UserAdmin(AuthUserAdmin):
 
 
 class SatsangProfileAdmin(admin.ModelAdmin):
-    list_display = ("SatsangiWithLogo", "Profile_Completion", "WhatsApp", "Call", "SMS",)
+    list_display = ("yuvakimage", "SatsangiWithLogo", "Profile_Completion", "WhatsApp", "Call", "SMS",)
     fieldsets = ((None, {"fields": (("NityaPuja", "NityaPujaYear"),
                                     ("TilakChandlo", "TilakChandloYear"),
                                     ("Satsangi", "SatsangiYear"),
@@ -320,6 +320,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
     list_per_page = 20
     search_fields = ('yuvakProfile__FirstName__icontains', 'yuvakProfile__SurName__icontains')
     list_filter = [RoleFilter, ProgresBarFilter]
+    list_display_links = ["SatsangiWithLogo", ]
 
     def SatsangiWithLogo(self, obj):
         s = obj.yuvakProfile.__str__()
@@ -361,6 +362,16 @@ class SatsangProfileAdmin(admin.ModelAdmin):
             ''',
             Profile_Completion(obj)
         )
+
+    def yuvakimage(self, obj):
+        if obj.yuvakProfile.ProfilePhoto:
+            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+                obj.yuvakProfile.ProfilePhoto.url)
+        else:
+            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
+
+    yuvakimage.short_description = ""
 
     def get_search_fields(self, request):
         if not request.user.is_superuser:
