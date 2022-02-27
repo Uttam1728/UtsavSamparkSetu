@@ -43,11 +43,14 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
         return ''
 
     def Karykar_1_image(self, obj):
-        if obj.karykar1profile and obj.karykar1profile.ProfilePhoto:
-            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
-                obj.karykar1profile.ProfilePhoto.url)
+        if obj.karykar1profile:
+            if obj.karykar1profile.ProfilePhoto:
+                s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+                    obj.karykar1profile.ProfilePhoto.url)
+            else:
+                s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
         else:
-            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+            s = ''
         return format_html(s)
 
     Karykar_1_image.short_description = ""
@@ -60,12 +63,15 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
         return ''
 
     def Karykar_2_image(self, obj):
-        if obj.karykar2profile and obj.karykar2profile.ProfilePhoto:
-            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" ' \
-                'alt="profilepic"/></div>'.format(
-                obj.karykar2profile.ProfilePhoto.url)
+        if obj.karykar2profile:
+            if obj.karykar2profile.ProfilePhoto:
+                s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" ' \
+                    'alt="profilepic"/></div>'.format(
+                    obj.karykar2profile.ProfilePhoto.url)
+            else:
+                s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
         else:
-            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+            s = ''
         return format_html(s)
 
     Karykar_2_image.short_description = ""
