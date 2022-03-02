@@ -108,7 +108,7 @@ class KaryakramAdmin(admin.ModelAdmin):
 
 class MandalProfileAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/mandal_change_list.html'
-    list_display = ("__str__", "Nirikshak_details", "Sanchalak_details",)
+    list_display = ("__str__", "Nirikshak_photo", "Nirikshak_details", "Sanchalak_photo", "Sanchalak_details",)
     list_per_page = 20
 
     def Nirikshak_details(self, obj):
@@ -122,6 +122,26 @@ class MandalProfileAdmin(admin.ModelAdmin):
             return format_html(obj.Sanchalak.FirstName + " " + obj.Sanchalak.SurName + " <br> " + messageIcons(
                 obj.Sanchalak.WhatsappNo, 20))
         return ''
+
+    def Nirikshak_photo(self, obj):
+        if obj.Nirikshak:
+            if obj.Nirikshak.ProfilePhoto:
+                s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" ' \
+                    'alt="profilepic"/></div>'.format(
+                    obj.Nirikshak.ProfilePhoto.url)
+                return format_html(s)
+        s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
+
+    def Sanchalak_photo(selfself, obj):
+        if obj.Sanchalak:
+            if obj.Sanchalak.ProfilePhoto:
+                s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" ' \
+                    'alt="profilepic"/></div>'.format(
+                    obj.Sanchalak.ProfilePhoto.url)
+                return format_html(s)
+        s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
 
 
 admin.site.register(MandalProfile, MandalProfileAdmin)
