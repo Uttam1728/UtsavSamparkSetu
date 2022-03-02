@@ -99,7 +99,8 @@ class FollowUpAdminForm(forms.ModelForm):
 class FollowUpAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/followup_change_list.html'
 
-    list_display = ("__str__", "YuvakName", "StatusWithColor", "ComingLogo", "How", "Karykar_Names", "Followup_Time")
+    list_display = (
+    "__str__", "yuvakimage", "YuvakName", "StatusWithColor", "ComingLogo", "How", "Karykar_Names", "Followup_Time")
     list_filter = [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, KarykarDropdownFilter, "Present",
                    AdminFollowUpFilter, RoleFilter, "Coming", "LastFollowUp_Time"]
     fieldsets = ((None, {"fields": ("Karyakram", "KaryKarVrund", "Yuvak", "Status", "Coming", "How", "Remark")}),)
@@ -154,6 +155,15 @@ class FollowUpAdmin(admin.ModelAdmin):
     def Followup_Time(selfself, obj):
         return obj.LastFollowUp_Time if obj.Status == FollowupStatus.Done else " - "
 
+    def yuvakimage(self, obj):
+        if obj.Yuvak.ProfilePhoto:
+            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+                obj.Yuvak.ProfilePhoto.url)
+        else:
+            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
+
+    yuvakimage.short_description = ""
     '''
     # actions = ['change_status']
     
@@ -241,7 +251,8 @@ class Attandance(FollowUp):
 
 class AttandanceAdmin(FollowUpAdmin):
     list_display = (
-        "Karyakram", "QR", "YuvakName", "Present", "StatusWithColor", "Feedback", "How", "Karykar_Names", "Entry_Time")
+        "Karyakram", "QR", "yuvakimage", "YuvakName", "Present", "StatusWithColor", "Feedback", "How", "Karykar_Names",
+        "Entry_Time")
     fieldsets = (
         (None, {"fields": ("Karyakram", "KaryKarVrund", "Yuvak", "Status", "Coming", "How", "Remark", "Present")}),)
     list_filter = [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, KarykarDropdownFilter, "Present",
@@ -304,6 +315,16 @@ class AttandanceAdmin(FollowUpAdmin):
 
     def Entry_Time(selfself, obj):
         return obj.Attandance_Time if obj.Present else " - "
+
+    def yuvakimage(self, obj):
+        if obj.Yuvak.ProfilePhoto:
+            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+                obj.Yuvak.ProfilePhoto.url)
+        else:
+            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
+
+    yuvakimage.short_description = ""
 
     def get_list_display(self, request):
         if request.user.is_superuser:
