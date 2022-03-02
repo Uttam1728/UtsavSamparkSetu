@@ -78,6 +78,17 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
 
     def Yuvak_List(self, obj):
         s = ''
+        if not self.request.user.is_superuser:
+            if not is_member(self.request.user, "Sampark Karykar"):
+                yuvak = self.request.user.yuvakprofile
+                profile_completion_yuvak = Profile_Completion(yuvak)
+                profile_completion_satsangi = Profile_Completion(yuvak.satsangprofile)
+                s += '<li>{} {} <progress value="{}" style="width:65px" max="100"></progress><span style="font-size:12px"> {}%  </span><progress value="{}" style="width:65px"  max="100"></progress><span style="font-size:12px" > {}%</span></li>'.format(
+                    yuvak.FirstName, yuvak.SurName, profile_completion_yuvak,
+                    profile_completion_yuvak, profile_completion_satsangi,
+                    profile_completion_satsangi)
+                return format_html(s)
+
         for yuvak in obj.Yuvaks.all():
             profile_completion_yuvak = Profile_Completion(yuvak)
             profile_completion_satsangi = Profile_Completion(yuvak.satsangprofile)
@@ -96,6 +107,7 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
         return super().get_search_fields(request)
 
     def get_queryset(self, request):
+        self.request = request
         qs = super(KaryakarProfileAdmin, self).get_queryset(request)
         mandal = getMandal(request.user)
         if request.user.is_superuser:
