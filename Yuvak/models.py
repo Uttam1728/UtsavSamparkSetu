@@ -56,28 +56,39 @@ class YuvakProfile(models.Model):
 
 
 class SatsangProfile(models.Model):
-    yuvakProfile = models.OneToOneField(YuvakProfile, on_delete=models.CASCADE)
-    NityaPuja = models.BooleanField(blank=True, null=True)
-    NityaPujaYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True)
-    TilakChandlo = models.BooleanField(blank=True, null=True)
-    TilakChandloYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True)
-    Satsangi = models.BooleanField(blank=True, null=True)
-    SatsangiYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True)
-    AthvadikSabha = models.BooleanField(blank=True, null=True)
-    AthvadikSabhaYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True)
-    Ravisabha = models.BooleanField(blank=True, null=True)
-    RavisabhaYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True)
-    GharSatsang = models.BooleanField(blank=True, null=True)
-    GharSatsangYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True)
-    SSP = models.BooleanField(blank=True, null=True)
+    yuvakProfile = models.OneToOneField(YuvakProfile, on_delete=models.CASCADE, )
+    NityaPuja = models.BooleanField(blank=True, null=True, verbose_name='નિત્યપૂજા')
+    NityaPujaYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True,
+                                        verbose_name="નિત્યપૂજા કેટલા વર્ષથી")
+    TilakChandlo = models.BooleanField(blank=True, null=True, verbose_name="તિલક ચાંદલો")
+    TilakChandloYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True,
+                                           verbose_name="તિલક ચાંદલો કેટલા વર્ષથી")
+    Satsangi = models.BooleanField(blank=True, null=True, verbose_name="સત્સંગ")
+    SatsangiYear = models.IntegerField(validators=[MaxValueValidator(30)], verbose_name="સત્સંગ કેટલા વર્ષથી",
+                                       blank=True, null=True)
+    AthvadikSabha = models.BooleanField(blank=True, null=True, verbose_name="અઠવાડિકસભા")
+    AthvadikSabhaYear = models.IntegerField(validators=[MaxValueValidator(30)], verbose_name="અઠવાડિકસભા કેટલા વર્ષથી",
+                                            blank=True,
+                                            null=True)
+    Ravisabha = models.BooleanField(blank=True, null=True, verbose_name="રવિસભા")
+    RavisabhaYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True,
+                                        verbose_name="રવિસભા કેટલા વર્ષથી")
+    GharSatsang = models.BooleanField(blank=True, null=True, verbose_name="ઘરસત્સંગ")
+    GharSatsangYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True,
+                                          verbose_name="ઘરસત્સંગ કેટલા વર્ષથી")
+    SSP = models.BooleanField(blank=True, null=True, verbose_name="સત્સંગ શિક્ષણ પરીક્ષા")
     SSPStage = models.IntegerField(
         default=SSPStage.No,
-        choices=[(methods.value, methods.name) for methods in SSPStage]  # Choices is a list of Tuple
+        choices=[(methods.value, methods.name) for methods in SSPStage], verbose_name="છેલ્લી પરીક્ષા"
+        # Choices is a list of Tuple
     )
-    Ekadashi = models.BooleanField(blank=True, null=True)
-    EkadashiYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True)
-    Niymit_Vanchan = models.BooleanField(blank=True, null=True)
-    Niymit_VanchanYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True)
+    Ekadashi = models.BooleanField(blank=True, null=True, verbose_name="એકાદશી")
+    EkadashiYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True,
+                                       verbose_name="એકાદશી કેટલા વર્ષથી")
+    Niymit_Vanchan = models.BooleanField(blank=True, null=True, verbose_name="નિયમિત વાંચન",
+                                         help_text="૧ વચનામૃત અને ૫ સ્વામીની વાતો અથવા પ્રમુખસ્વામી મહારાજ નું જીવન ચરિત્ર વાંચન")
+    Niymit_VanchanYear = models.IntegerField(validators=[MaxValueValidator(30)], blank=True, null=True,
+                                             verbose_name="નિયમિત વાંચન કેટલા વર્ષથી", )
 
     def __str__(self):
         return self.yuvakProfile.__str__()
