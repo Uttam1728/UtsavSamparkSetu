@@ -17,15 +17,20 @@ from django.utils.html import format_html
 from rangefilter.filter import DateRangeFilter
 
 from Common.util import Profile_Completion, getMandal, is_member
+from FolloWUp.models import FollowUp
+from Mandal.admin import adminVrund
+from Mandal.models import Karyakram
 from Yuvak.models import SatsangProfile, YuvakProfile
 
 
 # method for updating
 @receiver(post_save, sender=YuvakProfile)
-def Create_SatsangiProfile(sender, instance, **kwargs):
+def YUvakProfileSupport(sender, instance, **kwargs):
+    # create satsangi profile and link
     if not SatsangProfile.objects.filter(yuvakProfile=instance).exists():
         s = SatsangProfile(yuvakProfile=instance)
         s.save()
+    # create user
     username = instance.FirstName.lower() + str(instance.pk).zfill(3)
     email = username + '@' + username + '.com'
     if instance.user is None:
@@ -36,6 +41,13 @@ def Create_SatsangiProfile(sender, instance, **kwargs):
         group = Group.objects.get(name='Yuvak')
         user.groups.add(group)
         YuvakProfile.objects.filter(pk=instance.pk).update(user=user)
+    # create followup if any karyakaram is active
+    qs = Karyakram.objects.filter(Start_Folloup=True, IsDone=False)
+    if qs.exists():
+        if not FollowUp.objects.filter(Karyakram=qs.first(), Yuvak=instance).exists():
+            FollowUp.objects.get_or_create(Karyakram=qs.first(),
+                                           KaryKarVrund=adminVrund(instance.mandal),
+                                           Yuvak=instance)
 
 
 # Register your models here.
