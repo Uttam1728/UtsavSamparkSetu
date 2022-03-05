@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'Mandal',
     'FolloWUp',
     'client_side_image_cropping',
+    'more_admin_filters',
+    'advanced_filters',
 ]
 
 MIDDLEWARE = [

@@ -12,11 +12,13 @@ from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.forms import DateInput
+from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.html import format_html
+from more_admin_filters import MultiSelectDropdownFilter
 from rangefilter.filter import DateRangeFilter
 
-from Common.util import Profile_Completion, getMandal, is_member
+from Common.util import Profile_Completion, getMandal, is_member, create_Excel_queryset
 from FolloWUp.models import FollowUp
 from Mandal.admin import adminVrund
 from Mandal.models import Karyakram
@@ -149,9 +151,27 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     form = YuvakProfileForm
     list_display = ("yuvakimage", "Yuvak", "Profile_Completion", "WhatsApp", "Call", "SMS", "userLink", "Role")
     list_per_page = 20
-    list_filter = [RoleFilter, ("DateOfBirth", DateRangeFilter), KaryKarAlloatMentFilter, ProgresBarFilter]
+    list_filter = [RoleFilter, ("DateOfBirth", DateRangeFilter), KaryKarAlloatMentFilter, ProgresBarFilter,
+                   ('Education', MultiSelectDropdownFilter), ]
     search_fields = ('FirstName__icontains', 'SurName__icontains')
     list_display_links = ["Yuvak", ]
+    actions = ['create_excel']
+
+    @admin.action(description='Create Excel')
+    def create_excel(modeladmin, request, queryset):
+        csvfile = create_Excel_queryset(queryset)
+        response = HttpResponse(csvfile.getvalue(), content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=csvfile.csv'
+        return response
+
+    def get_actions(self, request):
+        actions = super(YuvakProfileAdmin, self).get_actions(request)
+        if not request.user.is_superuser:
+            return dict()
+        return actions
+
+    # specify which fields can be selected in the advanced filter
+    # creation form
 
     def Yuvak(self, obj):
         s = obj.__str__()

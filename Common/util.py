@@ -1,9 +1,13 @@
 from datetime import datetime
+from io import StringIO
 
+import pandas as pd
 from django.db.models import Q
+from django.forms.models import model_to_dict
 
 from FolloWUp.models import FollowUp
 from Mandal.models import Karyakram
+from Yuvak.models import YuvakProfile
 
 
 def is_member(user, groupName):
@@ -53,3 +57,21 @@ def Profile_Completion(obj):
 
 def getMandal(user):
     return user.yuvakprofile.mandal
+
+
+def create_Excel_queryset(queryset):
+    records = []
+    if queryset.exists():
+        if queryset.model is YuvakProfile:
+            for yuvak in queryset:
+                meta_fileds = model_to_dict(yuvak)
+                if yuvak.ProfilePhoto:
+                    meta_fileds["ProfilePhoto"] = yuvak.ProfilePhoto.url
+                del meta_fileds["mandal"]
+                records.append(meta_fileds)
+
+    df = pd.DataFrame(records)
+    df.index += 1
+    s = StringIO()
+    df.to_csv(s, encoding='utf-8', index=True, )
+    return s

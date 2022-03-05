@@ -100,7 +100,7 @@ class FollowUpAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/followup_change_list.html'
 
     list_display = (
-    "__str__", "yuvakimage", "YuvakName", "StatusWithColor", "ComingLogo", "How", "Karykar_Names", "Followup_Time")
+        "__str__", "yuvakimage", "YuvakName", "StatusWithColor", "ComingLogo", "How", "Karykar_Names", "Followup_Time")
     list_filter = [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, KarykarDropdownFilter, "Present",
                    AdminFollowUpFilter, RoleFilter, "Coming", "LastFollowUp_Time"]
     fieldsets = ((None, {"fields": ("Karyakram", "KaryKarVrund", "Yuvak", "Status", "Coming", "How", "Remark")}),)
@@ -211,7 +211,11 @@ class FollowUpAdmin(admin.ModelAdmin):
 
     def get_list_filter(self, request):
         if not request.user.is_superuser:
-            return [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, ]
+            if is_member(request.user, "Sampark Karykar"):
+                return [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, ]
+            elif is_member(request.user, "Yuvak"):
+                return []
+
         return super().get_list_filter(request)
 
     def get_search_fields(self, request):

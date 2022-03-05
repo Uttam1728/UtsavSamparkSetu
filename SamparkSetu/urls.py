@@ -13,28 +13,26 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import redirect
-from django.urls import path
-from django.urls import re_path 
-from django.views.static import serve
-from django.conf.urls.static import static
-
-from django.conf import settings
+from django.urls import path, include
 
 from FolloWUp import views
-
 
 admin.site.site_header = 'Utsav Sampark Setu'
 admin.site.site_title = 'Utsav Sampark Setu'
 admin.site.enable_nav_sidebar = False
 admin.site.site_url = None
 urlpatterns = [
-    path('', lambda request: redirect('admin/', permanent=False)),
-    path('admin/', admin.site.urls),
-    path('mark_present', views.mark_attandance),
-    path('qr_scan',views.qr_scan)
-]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  path('', lambda request: redirect('admin/', permanent=False)),
+                  path('admin/', admin.site.urls),
+                  path('mark_present', views.mark_attandance),
+                  path('qr_scan', views.qr_scan),
 
+                  url(r'^advanced_filters/', include('advanced_filters.urls'))
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
