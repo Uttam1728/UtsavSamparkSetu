@@ -98,9 +98,10 @@ class FollowUpAdminForm(forms.ModelForm):
 
 class FollowUpAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/followup_change_list.html'
-
+    # date_hierarchy = 'LastFollowUp_Time'
     list_display = (
-        "__str__", "yuvakimage", "YuvakName", "StatusWithColor", "ComingLogo", "How", "Karykar_Names", "Followup_Time")
+        "__str__", "yuvakimage", "YuvakName", "StatusWithColor", "ComingLogo", "How", "Karykar_Names",
+        "LastFollowUp_Time")
     list_filter = [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, KarykarDropdownFilter, "Present",
                    AdminFollowUpFilter, RoleFilter, "Coming", "LastFollowUp_Time"]
     fieldsets = ((None, {"fields": ("Karyakram", "KaryKarVrund", "Yuvak", "Status", "Coming", "How", "Remark")}),)
@@ -256,7 +257,7 @@ class Attandance(FollowUp):
 class AttandanceAdmin(FollowUpAdmin):
     list_display = (
         "Karyakram", "QR", "yuvakimage", "YuvakName", "Present", "StatusWithColor", "Feedback", "How", "Karykar_Names",
-        "Entry_Time")
+        "Attandance_Time")
     fieldsets = (
         (None, {"fields": ("Karyakram", "KaryKarVrund", "Yuvak", "Status", "Coming", "How", "Remark", "Present")}),)
     list_filter = [KarykramDropdownFilter, StatusDropdownFilter, HowDropdownFilter, KarykarDropdownFilter, "Present",

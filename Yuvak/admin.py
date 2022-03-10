@@ -356,6 +356,8 @@ class SatsangProfileAdmin(admin.ModelAdmin):
     list_filter = [RoleFilter, ProgresBarFilter]
     list_display_links = ["SatsangiWithLogo", ]
 
+    # advanced_filter_fields = tuple(f.name for f in SatsangProfile._meta.fields)
+    # advanced_filter_fields = ('NityaPuja')
     def SatsangiWithLogo(self, obj):
         s = obj.yuvakProfile.__str__()
         if obj.yuvakProfile.karyakarprofile_set.exists():
