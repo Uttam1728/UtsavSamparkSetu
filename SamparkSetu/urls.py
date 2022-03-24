@@ -21,7 +21,6 @@ from django.shortcuts import redirect
 from django.urls import path, include
 
 from FolloWUp import views as Followup_view
-from Mandal import views as mandal_view
 
 admin.site.site_header = 'Utsav Sampark Setu'
 admin.site.site_title = 'Utsav Sampark Setu'
@@ -32,7 +31,6 @@ urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('mark_present', Followup_view.mark_attandance),
                   path('qr_scan', Followup_view.qr_scan),
-                  path('make_report', mandal_view.make_report),
 
                   url(r'^advanced_filters/', include('advanced_filters.urls'))
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
