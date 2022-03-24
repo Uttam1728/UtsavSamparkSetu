@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.html import format_html
 from django.utils.translation import gettext as _
 
-from Common.util import getMandal, is_member, messageIcons
+from Common.util import getMandal, is_member, messageIcons, make_report
 from FolloWUp.models import FollowUp, FollowupStatus
 from Mandal.models import Karyakram, MandalProfile
 from SamparkKarykar.models import KaryakarProfile
@@ -30,6 +30,14 @@ class KaryakramAdmin(admin.ModelAdmin):
     list_display = (
         "__str__", "Karyakram_date", "Start_date", "End_date", "Start_Folloup", "Start_Attandance", "IsDone")
     list_per_page = 20
+    actions = ['create_report']
+
+    @admin.action(description='Create Report')
+    def create_report(modeladmin, request, queryset):
+        csvfile = make_report(queryset.first().pk)
+        response = HttpResponse(csvfile.getvalue(), content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=report_karyakram.csv'
+        return response
 
     def get_fieldsets(self, request, obj):
         if not request.user.is_superuser:
