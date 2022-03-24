@@ -2,10 +2,10 @@ from datetime import datetime
 from io import StringIO
 
 import pandas as pd
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.forms.models import model_to_dict
 
-from FolloWUp.models import FollowUp
+from FolloWUp.models import FollowUp, FollowupStatus
 from Mandal.models import Karyakram
 from Yuvak.models import YuvakProfile
 
@@ -75,3 +75,15 @@ def create_Excel_queryset(queryset):
     s = StringIO()
     df.to_csv(s, encoding='utf-8', index=True, )
     return s
+
+
+def make_report(karyakram_id):
+    records = list((FollowUp.objects.filter(Karyakram=karyakram_id, Status=FollowupStatus.Pending)
+                    .values_list('KaryKarVrund__karykar1profile__FirstName', 'KaryKarVrund__karykar2profile__FirstName')
+                    .annotate(yuvaks=Count('Status'))
+                    .order_by()
+                    ))
+    df = pd.DataFrame(records)
+    csvstream = StringIO()
+    df.to_csv(csvstream, encoding='utf-8', index=False, )
+    return csvstream
