@@ -18,6 +18,27 @@ class SSPStage(IntEnum):
     Pragn_3 = 7
 
 
+class Interests(IntEnum):
+    No = 0
+    પ્રવક્તા = 1,
+    સંગીત = 2,
+    સાઉન્ડસિસ્ટમ = 3,
+    નાટક = 4,
+    વક્તૃત્વ = 5,
+    હાજરી = 6,
+    પ્રસાદ = 7
+    ડેકોરેશન = 8
+    સંપર્કકાર્યકાર = 9
+
+
+class SevaVibhag(models.Model):
+    name = models.CharField(max_length=255, )
+    guj_name = models.CharField(max_length=255, verbose_name="Seva Name")
+
+    def __str__(self):
+        return self.guj_name
+
+
 class YuvakProfile(models.Model):
     FirstName = models.CharField(max_length=50)
     MiddleName = models.CharField(max_length=50)
@@ -32,8 +53,14 @@ class YuvakProfile(models.Model):
     Married = models.BooleanField(blank=True, null=True)
     DateOfBirth = models.DateField(blank=True, null=True)
     Education = models.CharField(max_length=100, blank=True, null=True)
+    current_Education = models.BooleanField(blank=True, null=True, verbose_name='અભ્યાસ શરુ છે ?')
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, )
     mandal = models.ForeignKey(MandalProfile, on_delete=models.CASCADE)
+    Seva_Intrests = models.ManyToManyField(
+        SevaVibhag, verbose_name="વિશેષ રસ", blank=True,
+        help_text="જો આપને આમાંથી કોઈ વિભાગ માં રસ હોય તો એ સિલેક્ટ કરી શકશો"
+        # Choices is a list of Tuple
+    )
     ProfilePhoto = models.ImageField(
         upload_to='media/', blank=True, null=True)
 

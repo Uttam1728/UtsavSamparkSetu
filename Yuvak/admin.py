@@ -22,7 +22,7 @@ from Common.util import Profile_Completion, getMandal, is_member, create_Excel_q
 from FolloWUp.models import FollowUp
 from Mandal.admin import adminVrund
 from Mandal.models import Karyakram
-from Yuvak.models import SatsangProfile, YuvakProfile
+from Yuvak.models import SatsangProfile, YuvakProfile, SevaVibhag
 
 
 # method for updating
@@ -152,10 +152,12 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     list_display = ("yuvakimage", "Yuvak", "Profile_Completion", "WhatsApp", "Call", "SMS", "userLink", "Role")
     list_per_page = 20
     list_filter = [RoleFilter, ("DateOfBirth", DateRangeFilter), KaryKarAlloatMentFilter, ProgresBarFilter,
-                   ('Education', MultiSelectDropdownFilter), ]
+                   ('Education', MultiSelectDropdownFilter), 'current_Education',
+                   ('Seva_Intrests__guj_name', MultiSelectDropdownFilter)]
     search_fields = ('FirstName__icontains', 'SurName__icontains')
     list_display_links = ["Yuvak", ]
     actions = ['create_excel']
+    autocomplete_fields = ('Seva_Intrests',)
 
     @admin.action(description='Create Excel')
     def create_excel(modeladmin, request, queryset):
@@ -463,7 +465,13 @@ class SatsangProfileAdmin(admin.ModelAdmin):
         return queryset, use_distinct
 
 
+class SevaVibhagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'guj_name')
+    search_fields = ('name__icontains',)
+
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(YuvakProfile, YuvakProfileAdmin)
 admin.site.register(SatsangProfile, SatsangProfileAdmin)
+admin.site.register(SevaVibhag, SevaVibhagAdmin)
