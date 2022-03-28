@@ -7,7 +7,6 @@ from django.forms.models import model_to_dict
 
 from FolloWUp.models import FollowUp, FollowupStatus
 from Mandal.models import Karyakram
-from Yuvak.models import YuvakProfile
 
 
 def is_member(user, groupName):
@@ -30,12 +29,12 @@ def getLatestKarykram(samparkKarykar):
 
 def messageIcons(phoneNo, size=27, message=True):
     buttons = ''
-    buttons += "&nbsp; <a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:{}px;color:green'></i></a>".format(
+    buttons += "&nbsp; <a href='https://wa.me/+91{}' target='_blank'><i class='fa fa-whatsapp' style='font-size:{}px;color:green'></i></a>".format(
         phoneNo, size)
-    buttons += "&nbsp; <a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:{}px;color:deepskyblue;margin-left:5px'></i> </a>".format(
+    buttons += "&nbsp; <a href='tel:+91{}' target='_blank'> <i class='fa fa-volume-control-phone' style='font-size:{}px;color:deepskyblue;margin-left:5px'></i> </a>".format(
         phoneNo, size)
     if message:
-        buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:{}px;color:lightblue;margin-left:5px'></i> </a>".format(
+        buttons += "&nbsp; <a href='sms:+91{}' target='_blank'> <i class='fa fa-commenting-o' style='font-size:{}px;color:lightblue;margin-left:5px'></i> </a>".format(
             phoneNo, size)
         # buttons += "&nbsp; <a href='sms:+91{}'> <i class='fa fa-send-o' style='font-size:27px;color:deepskyblue;margin-left:5px'></i> </a>".format(phoneNo)
 
@@ -62,13 +61,14 @@ def getMandal(user):
 def create_Excel_queryset(queryset):
     records = []
     if queryset.exists():
-        if queryset.model is YuvakProfile:
-            for yuvak in queryset:
-                meta_fileds = model_to_dict(yuvak)
-                if yuvak.ProfilePhoto:
-                    meta_fileds["ProfilePhoto"] = yuvak.ProfilePhoto.url
-                del meta_fileds["mandal"]
-                records.append(meta_fileds)
+        for yuvak in queryset:
+            if queryset.model is FollowUp:
+                yuvak = yuvak.Yuvak
+            meta_fileds = model_to_dict(yuvak)
+            if yuvak.ProfilePhoto:
+                meta_fileds["ProfilePhoto"] = yuvak.ProfilePhoto.url
+            del meta_fileds["mandal"]
+            records.append(meta_fileds)
 
     df = pd.DataFrame(records)
     df.index += 1

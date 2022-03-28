@@ -7,11 +7,12 @@ from django import forms
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.http import HttpResponse
 from django.utils.html import format_html
 
 import SamparkKarykar.models
 from Common.filters import KarykarDropdownFilter, HowDropdownFilter, StatusDropdownFilter, KarykramDropdownFilter
-from Common.util import getMandal, is_member, messageIcons
+from Common.util import getMandal, is_member, messageIcons, create_Excel_queryset
 from FolloWUp.models import FollowUp, FollowupStatus, ComingStatus
 
 # Register your models here.
@@ -114,6 +115,14 @@ class FollowUpAdmin(admin.ModelAdmin):
         'KaryKarVrund__karykar2profile__SurName__icontains',
         'Yuvak__FirstName__icontains',
         'Yuvak__SurName__icontains')
+    actions = ['create_excel', ]
+
+    @admin.action(description='Create Excel')
+    def create_excel(modeladmin, request, queryset):
+        csvfile = create_Excel_queryset(queryset)
+        response = HttpResponse(csvfile.getvalue(), content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=FollowUp_Yuvaks_records.csv'
+        return response
 
     def YuvakName(self, obj):
         return format_html(
@@ -185,6 +194,12 @@ class FollowUpAdmin(admin.ModelAdmin):
     # change_status.allowed_permissions = ('change',)
     # change_status.short_description = "Mark selected Yuvak as..."
     '''
+
+    def get_actions(self, request):
+        actions = super(FollowUpAdmin, self).get_actions(request)
+        if not request.user.is_superuser:
+            return dict()
+        return actions
 
     def get_queryset(self, request):
         qs = super(FollowUpAdmin, self).get_queryset(request)

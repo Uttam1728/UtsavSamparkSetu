@@ -1,6 +1,9 @@
+import time
+import webbrowser as web
 from functools import reduce
 from operator import or_
 
+import pyautogui as pg
 from client_side_image_cropping import ClientsideCroppingWidget
 from django import forms
 from django.contrib import admin
@@ -156,15 +159,36 @@ class YuvakProfileAdmin(admin.ModelAdmin):
                    ('Seva_Intrests__guj_name', MultiSelectDropdownFilter)]
     search_fields = ('FirstName__icontains', 'SurName__icontains')
     list_display_links = ["Yuvak", ]
-    actions = ['create_excel']
+    actions = ['create_excel', 'send_Whatsapp_msg']
     autocomplete_fields = ('Seva_Intrests',)
 
     @admin.action(description='Create Excel')
     def create_excel(modeladmin, request, queryset):
         csvfile = create_Excel_queryset(queryset)
         response = HttpResponse(csvfile.getvalue(), content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=csvfile.csv'
+        response['Content-Disposition'] = 'attachment; filename=Yuvak_records.csv'
         return response
+
+    @admin.action(description='Send Whatsapp Message of Sabha')
+    def send_Whatsapp_msg(modeladmin, request, queryset):
+
+        first = True
+        for yuvak in queryset:
+            if yuvak.WhatsappNo:
+                time.sleep(4)
+                web.open(
+                    "https://web.whatsapp.com/send?phone=" + '+91' + str(
+                        yuvak.WhatsappNo) + "&text=" + 'automating text msg, ignore')
+                if first:
+                    time.sleep(6)
+                    first = False
+                width, height = pg.size()
+                pg.click(width / 2, height / 2)
+                time.sleep(8)
+
+                pg.press('enter')
+                time.sleep(8)
+                pg.hotkey('ctrl', 'w')
 
     def get_actions(self, request):
         actions = super(YuvakProfileAdmin, self).get_actions(request)
@@ -183,7 +207,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
 
     def WhatsApp(self, obj):
         buttons = ''
-        buttons += "<a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(
+        buttons += "<a href='https://wa.me/+91{}' target='_blank'><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(
             obj.WhatsappNo)
         return format_html(buttons)
 
@@ -191,7 +215,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
 
     def Call(self, obj):
         buttons = ''
-        buttons += "<a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;'></i> </a>".format(
+        buttons += "<a href='tel:+91{}' target='_blank'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;'></i> </a>".format(
             obj.WhatsappNo)
         return format_html(buttons)
 
@@ -199,7 +223,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
 
     def SMS(self, obj):
         buttons = ''
-        buttons += "<a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;'></i> </a>".format(
+        buttons += "<a href='sms:+91{}' target='_blank'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;'></i> </a>".format(
             obj.WhatsappNo)
         return format_html(buttons)
 
@@ -370,7 +394,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
 
     def WhatsApp(self, obj):
         buttons = ''
-        buttons += "<a href='https://wa.me/+91{}' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(
+        buttons += "<a href='https://wa.me/+91{}' target='_blank' ><i class='fa fa-whatsapp' style='font-size:30px;color:green'></i></a>".format(
             obj.yuvakProfile.WhatsappNo)
         return format_html(buttons)
 
@@ -378,7 +402,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
 
     def Call(self, obj):
         buttons = ''
-        buttons += "<a href='tel:+91{}'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;'></i> </a>".format(
+        buttons += "<a href='tel:+91{}' target='_blank'> <i class='fa fa-volume-control-phone' style='font-size:27px;color:deepskyblue;'></i> </a>".format(
             obj.yuvakProfile.WhatsappNo)
         return format_html(buttons)
 
@@ -386,7 +410,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
 
     def SMS(self, obj):
         buttons = ''
-        buttons += "<a href='sms:+91{}'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;'></i> </a>".format(
+        buttons += "<a href='sms:+91{}' target='_blank'> <i class='fa fa-commenting-o' style='font-size:27px;color:lightblue;'></i> </a>".format(
             obj.yuvakProfile.WhatsappNo)
         return format_html(buttons)
 

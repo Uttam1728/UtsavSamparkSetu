@@ -39,6 +39,12 @@ class KaryakramAdmin(admin.ModelAdmin):
         response['Content-Disposition'] = 'attachment; filename=report_karyakram.csv'
         return response
 
+    def get_actions(self, request):
+        actions = super(MandalProfileAdmin, self).get_actions(request)
+        if not request.user.is_superuser:
+            return dict()
+        return actions
+
     def get_fieldsets(self, request, obj):
         if not request.user.is_superuser:
             if is_member(request.user, "Sampark Karykar"):
