@@ -1,9 +1,7 @@
-import time
-import webbrowser as web
 from functools import reduce
 from operator import or_
 
-import pyautogui as pg
+# import pyautogui as pg
 from client_side_image_cropping import ClientsideCroppingWidget
 from django import forms
 from django.contrib import admin
@@ -171,24 +169,24 @@ class YuvakProfileAdmin(admin.ModelAdmin):
 
     @admin.action(description='Send Whatsapp Message of Sabha')
     def send_Whatsapp_msg(modeladmin, request, queryset):
-
-        first = True
-        for yuvak in queryset:
-            if yuvak.WhatsappNo:
-                time.sleep(4)
-                web.open(
-                    "https://web.whatsapp.com/send?phone=" + '+91' + str(
-                        yuvak.WhatsappNo) + "&text=" + 'automating text msg, ignore')
-                if first:
-                    time.sleep(6)
-                    first = False
-                width, height = pg.size()
-                pg.click(width / 2, height / 2)
-                time.sleep(8)
-
-                pg.press('enter')
-                time.sleep(8)
-                pg.hotkey('ctrl', 'w')
+        pass
+        # first = True
+        # for yuvak in queryset:
+        #     if yuvak.WhatsappNo:
+        #         time.sleep(4)
+        #         web.open(
+        #             "https://web.whatsapp.com/send?phone=" + '+91' + str(
+        #                 yuvak.WhatsappNo) + "&text=" + 'automating text msg, ignore')
+        #         if first:
+        #             time.sleep(6)
+        #             first = False
+        #         width, height = pg.size()
+        #         pg.click(width / 2, height / 2)
+        #         time.sleep(8)
+        #
+        #         pg.press('enter')
+        #         time.sleep(8)
+        #         pg.hotkey('ctrl', 'w')
 
     def get_actions(self, request):
         actions = super(YuvakProfileAdmin, self).get_actions(request)
