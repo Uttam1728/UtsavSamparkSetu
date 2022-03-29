@@ -6,6 +6,8 @@
 {% endblock %}
 
 {% block extrahead %}
+
+<meta name="theme-color" content="#79AEC8">
 <link rel="shortcut icon" href="{% static 'img/utsav.png' %}"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="{% static 'client_side_image_cropping/croppie.css' %}">
@@ -14,6 +16,27 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="{% static 'client_side_image_cropping/croppie.min.js' %}"></script>
 <script src="{% static 'client_side_image_cropping/cropping_widget.js' %}"></script>
+<link rel="manifest" href='/manifest.json'>
+<link rel="apple-touch-icon" href="{% static 'img/utsav.png' %}">
+<script type="text/javascript">
+    // Initialize the service worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register( "/serviceworker.js", {
+            scope:'/' // <--- THIS BIT IS REQUIRED
+        }).then (function (registration) {
+            //Registration was successful
+            console.log('django-progresssive-web -app: ServiceWorker registration successful with scope: ', registration.scope);
+        }, function (err) {
+            // registration failed :(
+            console.log("django-progressive-web -app: ServiceWorker registration failed: ", err);
+        });
+    }
+
+
+
+
+
+</script>
 {% endblock %}
 
 {% block extrastyle  %}{{ block.super }}
@@ -38,3 +61,4 @@
     {{site_header|default:_('Django administration') }}</a></h1>
 
 {% endblock %}
+<!--'/static/img/swaminarayan.png','/static/img/gunatitanandswami.png','/static/img/bhagataji_maharaj.png','/static/img/Shastriji_Maharaj.png','/static/img/yogiji_maharaj.png','/static/img/psm.png','/static/img/msm.png'-->

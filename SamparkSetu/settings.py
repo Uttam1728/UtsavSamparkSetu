@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'client_side_image_cropping',
     'more_admin_filters',
     'advanced_filters',
+    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -164,3 +165,9 @@ AWS_S3_SECRET_ACCESS_KEY = 'VWEoZo13rUK3uKHIT3Jat60r0wed6UO/xO5Q0ewC'
 AWS_STORAGE_BUCKET_NAME = "samparksetu"
 
 AWS_QUERYSTRING_AUTH = False
+
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'Yuvak/static/myjs', 'serviceworker.js')
+PWA_APP_ICONS = [{'src': '/static/img/utsav.png', 'sizes': '512x512'}]
+PWA_APP_NAME = 'Utsav Sampark Setu'
+PWA_APP_DESCRIPTION = "Utsav Sampark Setu"
+PWA_APP_START_URL = '/admin'
