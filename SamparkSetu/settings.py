@@ -167,7 +167,8 @@ AWS_STORAGE_BUCKET_NAME = "samparksetu"
 AWS_QUERYSTRING_AUTH = False
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'Yuvak/static/myjs', 'serviceworker.js')
-PWA_APP_ICONS = [{'src': '/static/img/utsav.png', 'sizes': '512x512'}]
+PWA_APP_ICONS = [{'src': '/static/img/utsav.png', 'sizes': '512x512'},
+                 {'src': '/static/img/utsav.png', 'sizes': '512x512', "purpose": "maskable"}]
 PWA_APP_NAME = 'Utsav Sampark Setu'
 PWA_APP_DESCRIPTION = "Utsav Sampark Setu"
 PWA_APP_START_URL = '/admin'
