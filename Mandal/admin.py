@@ -40,7 +40,7 @@ class KaryakramAdmin(admin.ModelAdmin):
         return response
 
     def get_actions(self, request):
-        actions = super(MandalProfileAdmin, self).get_actions(request)
+        actions = super(KaryakramAdmin, self).get_actions(request)
         if not request.user.is_superuser:
             return dict()
         return actions
