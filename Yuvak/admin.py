@@ -379,11 +379,25 @@ class SatsangProfileAdmin(admin.ModelAdmin):
                                     )}),)
     list_per_page = 20
     search_fields = ('yuvakProfile__FirstName__icontains', 'yuvakProfile__SurName__icontains')
-    list_filter = [RoleFilter, ProgresBarFilter]
+    list_filter = [RoleFilter, ProgresBarFilter, 'GharSatsang']
     list_display_links = ["SatsangiWithLogo", ]
+    actions = ['create_excel', ]
 
     # advanced_filter_fields = tuple(f.name for f in SatsangProfile._meta.fields)
     # advanced_filter_fields = ('NityaPuja')
+    @admin.action(description='Create Excel')
+    def create_excel(modeladmin, request, queryset):
+        csvfile = create_Excel_queryset(queryset)
+        response = HttpResponse(csvfile.getvalue(), content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=Yuvak_records.csv'
+        return response
+
+    def get_actions(self, request):
+        actions = super(SatsangProfileAdmin, self).get_actions(request)
+        if not request.user.is_superuser:
+            return dict()
+        return actions
+
     def SatsangiWithLogo(self, obj):
         s = obj.yuvakProfile.__str__()
         if obj.yuvakProfile.karyakarprofile_set.exists():

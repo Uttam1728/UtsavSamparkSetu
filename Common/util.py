@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 
 from FolloWUp.models import FollowUp, FollowupStatus
 from Mandal.models import Karyakram
+from Yuvak.models import SatsangProfile
 
 
 def is_member(user, groupName):
@@ -64,6 +65,8 @@ def create_Excel_queryset(queryset):
         for yuvak in queryset:
             if queryset.model is FollowUp:
                 yuvak = yuvak.Yuvak
+            elif queryset.model is SatsangProfile:
+                yuvak = yuvak.yuvakProfile
             meta_fileds = model_to_dict(yuvak)
             if yuvak.ProfilePhoto:
                 meta_fileds["ProfilePhoto"] = yuvak.ProfilePhoto.url
