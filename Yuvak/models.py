@@ -7,6 +7,17 @@ from django.db import models
 from Mandal.models import MandalProfile
 
 
+def Profile_Completion(obj):
+    fields_names = [f.name for f in obj._meta.fields]
+    completed = 0
+    for field_name in fields_names:
+        value = getattr(obj, field_name)
+        completed += not (value is None or value == '')
+    ratio = (completed / len(fields_names)) * 100
+
+    return int(ratio)
+
+
 class SSPStage(IntEnum):
     No = 0
     prarambh = 1,
@@ -64,8 +75,15 @@ class YuvakProfile(models.Model):
     ProfilePhoto = models.ImageField(
         upload_to='media/', blank=True, null=True)
 
+    def get_absolute_url(self):
+        return f"/admin/Yuvak/yuvakprofile/{self.pk}/"
+
     def __str__(self):
         return self.FirstName + " " + self.MiddleName + " " + self.SurName
+
+    @property
+    def progress(self):
+        return Profile_Completion(self)
 
     def save(self):
         # if self.ProfilePhoto:
@@ -119,3 +137,10 @@ class SatsangProfile(models.Model):
 
     def __str__(self):
         return self.yuvakProfile.__str__()
+
+    def get_absolute_url(self):
+        return f"/admin/Yuvak/satsangprofile/{self.pk}/"
+
+    @property
+    def progress(self):
+        return Profile_Completion(self)

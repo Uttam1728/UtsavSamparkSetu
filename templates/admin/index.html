@@ -1,0 +1,41 @@
+{% extends "admin/index.html" %}
+{% block content %}
+<div class="card" style="
+    border-radius: 5px;
+    border: 0px solid black;
+    margin: 2px;
+    box-shadow: 2px 2px 4px #79aec8;
+    margin-bottom: 10px;">
+    <div class="card-body">
+
+        <div class="row" style="display: flex;">
+            <div class="col-sm">
+                {% if user.ProfilePhoto %}
+                <img src={{ user.ProfilePhoto.url }} height="80px" width="80px"
+                     style="border-radius: 50%;border: 1px solid black"
+                     alt="profilepic"/>
+                {% else %}
+                <img height="80px" width="80px" src="/static/img/yuvak.png">
+            </div>
+            <div class="col-sm" style="margin: auto;font-weight: 600;color: var(--link-fg)">
+                {{ user.yuvakprofile.FirstName }} {{ user.yuvakprofile.SurName }}
+            </div>
+            <div class="col-sm" style="font-size: small;margin: auto;min-width: 130px;">
+                <a href="{{ user.yuvakprofile.get_absolute_url }}" class="changelink">Yuvak Profile</a>
+                <br>
+                <progress value="{{ user.yuvakprofile.progress }}" max="100"
+                          style="max-width:90px;margin: 3px"></progress>
+                <span style="font-weight:bold;font-size: smaller">{{ user.yuvakprofile.progress }} %</span>
+                <br>
+                <a href="{{ user.yuvakprofile.satsangprofile.get_absolute_url }}" class="changelink">Satsangk
+                    Profile</a> <br>
+                <progress value="{{ user.yuvakprofile.satsangprofile.progress }}" max="100"
+                          style="max-width:90px;margin: 3px"></progress>
+                <span style="font-weight:bold;font-size: smaller"> {{ user.yuvakprofile.satsangprofile.progress }}%</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}
