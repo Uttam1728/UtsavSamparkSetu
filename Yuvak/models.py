@@ -73,7 +73,7 @@ class YuvakProfile(models.Model):
         if self.pk:
 
             yuvak = YuvakProfile.objects.get(pk=self.pk)
-            if yuvak.ProfilePhoto:
+            if yuvak.ProfilePhoto and self.ProfilePhoto:
                 old_url = yuvak.ProfilePhoto.url.split('/')[-1]
                 new_url = self.ProfilePhoto.url.split('/')[-1]
                 if old_url != new_url:

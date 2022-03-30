@@ -31,7 +31,6 @@ urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('mark_present', Followup_view.mark_attandance),
                   path('qr_scan', Followup_view.qr_scan),
-
                   url(r'^advanced_filters/', include('advanced_filters.urls')),
                   path('', include('pwa.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

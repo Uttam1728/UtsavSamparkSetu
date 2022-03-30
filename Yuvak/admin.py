@@ -9,7 +9,7 @@ from django.contrib.auth.admin import UserAdmin as AuthUserAdmin
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+from django.db.models import Q, ImageField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.forms import DateInput
@@ -137,12 +137,6 @@ class YuvakProfileForm(forms.ModelForm):
         model = YuvakProfile
         fields = '__all__'
         widgets = {
-            'ProfilePhoto': ClientsideCroppingWidget(
-                width=300,
-                height=300,
-                preview_width=100,
-                preview_height=100,
-            ),
             'DateOfBirth': DateInput(attrs={'type': 'date'}),
         }
 
@@ -159,6 +153,14 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     list_display_links = ["Yuvak", ]
     actions = ['create_excel', 'send_Whatsapp_msg']
     autocomplete_fields = ('Seva_Intrests',)
+    formfield_overrides = {
+        ImageField: {'widget': ClientsideCroppingWidget(
+            width=300,
+            height=300,
+            preview_width=100,
+            preview_height=100,
+        ), },
+    }
 
     @admin.action(description='Create Excel')
     def create_excel(modeladmin, request, queryset):
