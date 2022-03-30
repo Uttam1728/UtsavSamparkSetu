@@ -10,12 +10,13 @@
 
         <div class="row" style="display: flex;">
             <div class="col-sm">
-                {% if user.ProfilePhoto %}
-                <img src={{ user.ProfilePhoto.url }} height="80px" width="80px"
-                     style="border-radius: 50%;border: 1px solid black"
+                {% if user.yuvakprofile.ProfilePhoto %}
+                <img src={{ user.yuvakprofile.ProfilePhoto.url }} height="80px" width="80px"
+                     style="border-radius: 50%;margin: 3px;border: 0px solid black ;box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);"
                      alt="profilepic"/>
                 {% else %}
                 <img height="80px" width="80px" src="/static/img/yuvak.png">
+                {% endif %}
             </div>
             <div class="col-sm" style="margin: auto;font-weight: 600;color: var(--link-fg)">
                 {{ user.yuvakprofile.FirstName }} {{ user.yuvakprofile.SurName }}
@@ -25,17 +26,17 @@
                 <br>
                 <progress value="{{ user.yuvakprofile.progress }}" max="100"
                           style="max-width:90px;margin: 3px"></progress>
-                <span style="font-weight:bold;font-size: smaller">{{ user.yuvakprofile.progress }} %</span>
+                <!--                <span style="font-weight:bold;font-size: smaller">{{ user.yuvakprofile.progress }} %</span>-->
                 <br>
                 <a href="{{ user.yuvakprofile.satsangprofile.get_absolute_url }}" class="changelink">Satsangk
                     Profile</a> <br>
                 <progress value="{{ user.yuvakprofile.satsangprofile.progress }}" max="100"
                           style="max-width:90px;margin: 3px"></progress>
-                <span style="font-weight:bold;font-size: smaller"> {{ user.yuvakprofile.satsangprofile.progress }}%</span>
+                <!--                <span style="font-weight:bold;font-size: smaller"> {{ user.yuvakprofile.satsangprofile.progress }}%</span>-->
             </div>
         </div>
     </div>
 </div>
-{% endif %}
+
 {{ block.super }}
 {% endblock %}
