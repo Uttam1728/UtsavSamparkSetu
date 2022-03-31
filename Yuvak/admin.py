@@ -458,7 +458,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
     def get_list_filter(self, request):
         if not request.user.is_superuser:
             if is_member(request.user, "Sampark Karykar"):
-                return [ProgresBarFilter, ]
+                return [ProgresBarFilter, 'GharSatsang']
             elif is_member(request.user, "Yuvak"):
                 return []
         return super().get_list_filter(request)
