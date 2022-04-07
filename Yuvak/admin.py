@@ -508,7 +508,7 @@ class SevaVibhagAdmin(admin.ModelAdmin):
     list_display = ('guj_name', 'leader_photo', 'leader_details', 'Yuvak_List')
     search_fields = ('name__icontains',)
 
-    autocomplete_fields = ('yuvaks',)
+    autocomplete_fields = ('yuvaks', 'leader')
 
     def leader_photo(selfself, obj):
         if obj.leader and obj.leader.ProfilePhoto:
