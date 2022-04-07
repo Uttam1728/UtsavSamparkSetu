@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, ImageField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.forms import DateInput
+from django.forms import DateInput, CheckboxSelectMultiple
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.html import format_html
@@ -138,6 +138,7 @@ class YuvakProfileForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'DateOfBirth': DateInput(attrs={'type': 'date'}),
+            'Seva_Intrests': CheckboxSelectMultiple()
         }
 
 
@@ -152,7 +153,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     search_fields = ('FirstName__icontains', 'SurName__icontains')
     list_display_links = ["Yuvak", ]
     actions = ['create_excel', 'send_Whatsapp_msg']
-    autocomplete_fields = ('Seva_Intrests',)
+    # autocomplete_fields = ('Seva_Intrests',)
     formfield_overrides = {
         ImageField: {'widget': ClientsideCroppingWidget(
             width=300,
