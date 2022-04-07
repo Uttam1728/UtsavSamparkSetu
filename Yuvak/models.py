@@ -45,6 +45,9 @@ class Interests(IntEnum):
 class SevaVibhag(models.Model):
     name = models.CharField(max_length=255, )
     guj_name = models.CharField(max_length=255, verbose_name="Seva Name")
+    yuvaks = models.ManyToManyField('YuvakProfile', blank=True, related_name='seva_yuvaks')
+    leader = models.ForeignKey('YuvakProfile', blank=True, null=True, related_name='seva_leader',
+                               on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.guj_name

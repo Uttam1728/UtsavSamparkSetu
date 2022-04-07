@@ -19,7 +19,7 @@ from django.utils.html import format_html
 from more_admin_filters import MultiSelectDropdownFilter
 from rangefilter.filter import DateRangeFilter
 
-from Common.util import Profile_Completion, getMandal, is_member, create_Excel_queryset
+from Common.util import Profile_Completion, getMandal, is_member, create_Excel_queryset, messageIcons
 from FolloWUp.models import FollowUp
 from Mandal.admin import adminVrund
 from Mandal.models import Karyakram
@@ -505,8 +505,36 @@ class SatsangProfileAdmin(admin.ModelAdmin):
 
 
 class SevaVibhagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'guj_name')
+    list_display = ('guj_name', 'leader_photo', 'leader_details', 'Yuvak_List')
     search_fields = ('name__icontains',)
+
+    autocomplete_fields = ('yuvaks',)
+
+    def leader_photo(selfself, obj):
+        if obj.leader and obj.leader.ProfilePhoto:
+            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+                obj.leader.ProfilePhoto.url)
+        else:
+            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+        return format_html(s)
+
+    def leader_details(self, obj):
+        if obj.leader:
+            return format_html(obj.leader.FirstName + " " + obj.leader.SurName + messageIcons(
+                obj.leader.WhatsappNo, 20))
+        return ''
+
+    leader_details.short_description = "_____Leader Details_____"
+
+    def Yuvak_List(self, obj):
+        s = ''
+        for yuvak in obj.yuvaks.all():
+            s += format_html(yuvak.FirstName + " " + yuvak.SurName + messageIcons(
+                yuvak.WhatsappNo, 20))
+            s += "<br>"
+        return format_html(s)
+
+    Yuvak_List.short_description = "___________________Yuvak List___________________."
 
 
 admin.site.unregister(User)
