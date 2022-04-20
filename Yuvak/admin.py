@@ -517,7 +517,7 @@ class SevaVibhagAdmin(admin.ModelAdmin):
                 obj.leader.WhatsappNo, 20)
         return format_html(s)
 
-    leader_details.short_description = "_____Leader Details_____"
+    leader_details.short_description = "_______________Leader Details_______________"
 
     def Yuvak_List(self, obj):
         s = ''
