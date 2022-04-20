@@ -173,23 +173,10 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     @admin.action(description='Send Whatsapp Message of Sabha')
     def send_Whatsapp_msg(modeladmin, request, queryset):
         pass
-        # first = True
-        # for yuvak in queryset:
-        #     if yuvak.WhatsappNo:
-        #         time.sleep(4)
-        #         web.open(
-        #             "https://web.whatsapp.com/send?phone=" + '+91' + str(
-        #                 yuvak.WhatsappNo) + "&text=" + 'automating text msg, ignore')
-        #         if first:
-        #             time.sleep(6)
-        #             first = False
-        #         width, height = pg.size()
-        #         pg.click(width / 2, height / 2)
-        #         time.sleep(8)
-        #
-        #         pg.press('enter')
-        #         time.sleep(8)
-        #         pg.hotkey('ctrl', 'w')
+        # time.sleep(5)
+        # pg.write("hi")
+        # time.sleep(0.5)
+        # pg.press("Enter")
 
     def get_actions(self, request):
         actions = super(YuvakProfileAdmin, self).get_actions(request)
@@ -528,7 +515,13 @@ class SevaVibhagAdmin(admin.ModelAdmin):
 
     def Yuvak_List(self, obj):
         s = ''
+        
         for yuvak in obj.yuvaks.all():
+            if yuvak.ProfilePhoto:
+                s += '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+                    obj.yuvak.ProfilePhoto.url)
+            else:
+                s += '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
             s += format_html(yuvak.FirstName + " " + yuvak.SurName + messageIcons(
                 yuvak.WhatsappNo, 20))
             s += "<br>"
