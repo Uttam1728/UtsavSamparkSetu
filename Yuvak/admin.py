@@ -512,6 +512,7 @@ class SevaVibhagAdmin(admin.ModelAdmin):
                 obj.leader.ProfilePhoto.url)
         else:
             s += '<img  height="60px" width="60px" src="/static/img/yuvak.png" >'
+        s += '<br>'
         if obj.leader:
             s += obj.leader.FirstName + " " + obj.leader.SurName + messageIcons(
                 obj.leader.WhatsappNo, 20)
