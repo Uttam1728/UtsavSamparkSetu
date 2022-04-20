@@ -499,10 +499,10 @@ class SevaVibhagAdmin(admin.ModelAdmin):
 
     def leader_photo(selfself, obj):
         if obj.leader and obj.leader.ProfilePhoto:
-            s = '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
+            s = '<img src={} height="60px" width="60px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
                 obj.leader.ProfilePhoto.url)
         else:
-            s = '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+            s = '<img  height="60px" width="60px" src="/static/img/yuvak.png" >'
         return format_html(s)
 
     def leader_details(self, obj):
@@ -518,10 +518,10 @@ class SevaVibhagAdmin(admin.ModelAdmin):
 
         for yuvak in obj.yuvaks.all():
             if yuvak.ProfilePhoto:
-                s += '<img src={} height="60px" width="60px" style="border-radius: 50%;border: 1px solid black;margin:10px" alt="profilepic"/></div>'.format(
+                s += '<img src={} height="60px" width="60px" style="border-radius: 50%;border: 1px solid black;margin:7px" alt="profilepic"/></div>'.format(
                     yuvak.ProfilePhoto.url)
             else:
-                s += '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
+                s += '<img  height="60px" width="60px" src="/static/img/yuvak.png" >'
             s += format_html(yuvak.FirstName + " " + yuvak.SurName + messageIcons(
                 yuvak.WhatsappNo, 20))
             s += "<br>"
