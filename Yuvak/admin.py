@@ -515,7 +515,7 @@ class SevaVibhagAdmin(admin.ModelAdmin):
 
     def Yuvak_List(self, obj):
         s = ''
-        
+
         for yuvak in obj.yuvaks.all():
             if yuvak.ProfilePhoto:
                 s += '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
