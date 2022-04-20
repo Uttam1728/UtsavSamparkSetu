@@ -519,7 +519,7 @@ class SevaVibhagAdmin(admin.ModelAdmin):
         for yuvak in obj.yuvaks.all():
             if yuvak.ProfilePhoto:
                 s += '<img src={} height="80px" width="80px" style="border-radius: 50%;border: 1px solid black" alt="profilepic"/></div>'.format(
-                    obj.yuvak.ProfilePhoto.url)
+                    yuvak.ProfilePhoto.url)
             else:
                 s += '<img  height="80px" width="80px" src="/static/img/yuvak.png" >'
             s += format_html(yuvak.FirstName + " " + yuvak.SurName + messageIcons(
