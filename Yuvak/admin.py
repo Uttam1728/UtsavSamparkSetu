@@ -512,13 +512,12 @@ class SevaVibhagAdmin(admin.ModelAdmin):
                 obj.leader.ProfilePhoto.url)
         else:
             s += '<img  height="60px" width="60px" src="/static/img/yuvak.png" >'
-        s += '<br>'
         if obj.leader:
-            s += obj.leader.FirstName + " " + obj.leader.SurName + messageIcons(
+            s += messageIcons(
                 obj.leader.WhatsappNo, 20)
         return format_html(s)
 
-    leader_details.short_description = "_______________Leader Details_______________"
+    leader_details.short_description = "Leader Details"
 
     def Yuvak_List(self, obj):
         s = ''
