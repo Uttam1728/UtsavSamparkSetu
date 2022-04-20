@@ -492,7 +492,7 @@ class SatsangProfileAdmin(admin.ModelAdmin):
 
 
 class SevaVibhagAdmin(admin.ModelAdmin):
-    list_display = ('guj_name', 'leader_photo', 'leader_details', 'Yuvak_List')
+    list_display = ('guj_name', 'leader_details', 'Yuvak_List')
     search_fields = ('name__icontains',)
 
     autocomplete_fields = ('yuvaks', 'leader')
@@ -506,10 +506,16 @@ class SevaVibhagAdmin(admin.ModelAdmin):
         return format_html(s)
 
     def leader_details(self, obj):
+        s = ''
+        if obj.leader and obj.leader.ProfilePhoto:
+            s += '<img src={} height="60px" width="60px" style="border-radius: 50%;border: 1px solid black;margin:7px"" alt="profilepic"/></div>'.format(
+                obj.leader.ProfilePhoto.url)
+        else:
+            s += '<img  height="60px" width="60px" src="/static/img/yuvak.png" >'
         if obj.leader:
-            return format_html(obj.leader.FirstName + " " + obj.leader.SurName + messageIcons(
-                obj.leader.WhatsappNo, 20))
-        return ''
+            s += obj.leader.FirstName + " " + obj.leader.SurName + messageIcons(
+                obj.leader.WhatsappNo, 20)
+        return format_html(s)
 
     leader_details.short_description = "_____Leader Details_____"
 
