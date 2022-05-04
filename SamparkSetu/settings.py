@@ -102,13 +102,13 @@ WSGI_APPLICATION = 'SamparkSetu.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd63fk4spg2t51q',
+        'NAME': 'd18ic22a3tphvt',
 
-        'USER': 'snfagitiajhaji',
+        'USER': 'yrmqrpvcsvcqjj',
 
-        'PASSWORD': '084084fac263eb7757a38c90dd965707205524ee002338abee8140daa803aba8',
+        'PASSWORD': '42c4fd8891613091b09096bfd29bd850cbd155730523574a84bd6b9d0c4eab0f',
 
-        'HOST': 'ec2-184-73-243-101.compute-1.amazonaws.com',
+        'HOST': 'ec2-3-229-252-6.compute-1.amazonaws.com',
 
         'PORT': '5432',
     }
