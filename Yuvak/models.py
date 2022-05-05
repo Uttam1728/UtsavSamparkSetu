@@ -77,6 +77,7 @@ class YuvakProfile(models.Model):
     )
     ProfilePhoto = models.ImageField(
         upload_to='media/', blank=True, null=True)
+    Email = models.EmailField(default="yuvak@utsavmandal.com")
 
     def get_absolute_url(self):
         return f"/admin/Yuvak/yuvakprofile/{self.pk}/"

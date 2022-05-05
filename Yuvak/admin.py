@@ -163,6 +163,15 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         ), },
     }
 
+    fieldsets = (("Profile", {"fields": (
+        "ProfilePhoto", "FirstName", "MiddleName", "SurName", "WhatsappNo", "Email", "HomePhoneNo",
+        "Married",
+        "DateOfBirth",
+        "Education",)}),
+                 ("Address", {"fields": ("HouseNo", "Soc_Name", "LandMark", "Area", "PinCode",)}),
+                 ("Seva Intrets", {"fields": ("Seva_Intrests", "mandal")}),
+                 )
+
     @admin.action(description='Create Excel')
     def create_excel(modeladmin, request, queryset):
         csvfile = create_Excel_queryset(queryset)
