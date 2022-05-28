@@ -86,7 +86,7 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
     Karykar_2_image.short_description = ""
 
     def Yuvak_List(self, obj):
-        s = ''
+        s = '<ol>'
         if not self.request.user.is_superuser:
             if not is_member(self.request.user, "Sampark Karykar"):
                 yuvak = self.request.user.yuvakprofile
@@ -98,13 +98,14 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
                     profile_completion_satsangi)
                 return format_html(s)
 
-        for yuvak in obj.Yuvaks.all():
+        for yuvak in obj.Yuvaks.all().order_by('FirstName'):
             profile_completion_yuvak = Profile_Completion(yuvak)
             profile_completion_satsangi = Profile_Completion(yuvak.satsangprofile)
             s += '<li>{} {} <progress value="{}" style="width:65px" max="100"></progress><span style="font-size:12px"> {}%  </span><progress value="{}" style="width:65px"  max="100"></progress><span style="font-size:12px" > {}%</span></li>'.format(
                 yuvak.FirstName, yuvak.SurName, profile_completion_yuvak,
                 profile_completion_yuvak, profile_completion_satsangi,
                 profile_completion_satsangi)  # + messageIcons(yuvak.WhatsappNo,20)
+        s += '</ol>'
         return format_html(s)
 
     Yuvak_List.short_description = "___________________________Yuvak List____________________________."
