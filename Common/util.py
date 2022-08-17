@@ -84,7 +84,7 @@ def create_Excel_karyakar_vrund_queryset(queryset):
     records = []
     if queryset.exists():
         for vrund in queryset:
-            for yuvak in vrund.yuvaks:
+            for yuvak in vrund.Yuvaks.all():
                 meta_fileds = model_to_dict(yuvak)
                 if yuvak.ProfilePhoto:
                     meta_fileds["ProfilePhoto"] = yuvak.ProfilePhoto.url
