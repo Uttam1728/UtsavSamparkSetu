@@ -6,7 +6,8 @@ from django.dispatch import receiver
 from django.http import HttpResponse
 from django.utils.html import format_html
 
-from Common.util import getMandal, is_member, messageIcons, Profile_Completion, create_Excel_queryset
+from Common.util import getMandal, is_member, messageIcons, Profile_Completion, create_Excel_queryset, \
+    create_Excel_karyakar_vrund_queryset
 from SamparkKarykar.models import KaryakarProfile
 
 
@@ -39,7 +40,7 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
 
     @admin.action(description='Create Excel')
     def create_excel(modeladmin, request, queryset):
-        csvfile = create_Excel_queryset(queryset)
+        csvfile = create_Excel_karyakar_vrund_queryset(queryset)
         response = HttpResponse(csvfile.getvalue(), content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=Yuvak_records.csv'
         return response

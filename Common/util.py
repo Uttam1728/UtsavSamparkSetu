@@ -80,6 +80,24 @@ def create_Excel_queryset(queryset):
     return s
 
 
+def create_Excel_karyakar_vrund_queryset(queryset):
+    records = []
+    if queryset.exists():
+        for vrund in queryset:
+            for yuvak in vrund.yuvaks:
+                meta_fileds = model_to_dict(yuvak)
+                if yuvak.ProfilePhoto:
+                    meta_fileds["ProfilePhoto"] = yuvak.ProfilePhoto.url
+                del meta_fileds["mandal"]
+                records.append(meta_fileds)
+
+    df = pd.DataFrame(records)
+    df.index += 1
+    s = StringIO()
+    df.to_csv(s, encoding='utf-8', index=True, )
+    return s
+
+
 def make_report(karyakram_id):
     records = list((FollowUp.objects.filter(Karyakram=karyakram_id, Status=FollowupStatus.Pending)
                     .values_list('KaryKarVrund__karykar1profile__FirstName', 'KaryKarVrund__karykar2profile__FirstName')

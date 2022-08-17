@@ -1,0 +1,14 @@
+
+hpython:S1192I"PDefine a constant instead of duplicating this literal "Sampark Karykar" 7 times.(ªÑµ©
+˜python:S1192‚"Define a constant instead of duplicating this literal '<img  height="60px" width="60px" src="/static/img/yuvak.png" >' 3 times.(…áü•
+;python:S125"Remove this commented out code.(ÉƒìÏûÿÿÿÿ
+vpython:S1542"YRename function "YUvakProfileSupport" to match the regular expression ^[a-z_][a-z0-9_]*$.(Ş”‹ûÿÿÿÿ
+[python:S5720°"BRename "modeladmin" to "self" or add the missing "self" parameter.(º¶Ô¨
+`python:S5720·"BRename "modeladmin" to "self" or add the missing "self" parameter.(àÈ¯Ãûÿÿÿÿ
+7python:S125’"Remove this commented out code.(ô’×
+7python:S125œ"Remove this commented out code.(—Š»ˆ
+<python:S125¹"Remove this commented out code.(È±“Úùÿÿÿÿ
+Ipython:S5806§"+Rename this variable; it shadows a builtin.(æÉùÿÿÿÿÿ
+[python:S5720‚"BRename "modeladmin" to "self" or add the missing "self" parameter.(º¶Ô¨
+7python:S125ÿ"Remove this commented out code.(ÈÜ‘‹
+^python:S5720ı"@Rename "selfself" to "self" or add the missing "self" parameter.(ùÙ«Éüÿÿÿÿ

@@ -83,36 +83,36 @@ WSGI_APPLICATION = 'SamparkSetu.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'TestSamparkSetu',
-
-        'USER': 'postgres',
-
-        'PASSWORD': '1234',
-
-        'HOST': 'localhost',
-
-        'PORT': '5432',
-    }
-}
-
+#
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'd18ic22a3tphvt',
+#         'NAME': 'TestSamparkSetu',
 #
-#         'USER': 'yrmqrpvcsvcqjj',
+#         'USER': 'postgres',
 #
-#         'PASSWORD': '42c4fd8891613091b09096bfd29bd850cbd155730523574a84bd6b9d0c4eab0f',
+#         'PASSWORD': '1234',
 #
-#         'HOST': 'ec2-3-229-252-6.compute-1.amazonaws.com',
+#         'HOST': 'localhost',
 #
 #         'PORT': '5432',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd18ic22a3tphvt',
+
+        'USER': 'yrmqrpvcsvcqjj',
+
+        'PASSWORD': '42c4fd8891613091b09096bfd29bd850cbd155730523574a84bd6b9d0c4eab0f',
+
+        'HOST': 'ec2-3-229-252-6.compute-1.amazonaws.com',
+
+        'PORT': '5432',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -172,3 +172,4 @@ PWA_APP_ICONS = [{'src': '/static/img/utsav.png', 'sizes': '512x512'},
 PWA_APP_NAME = 'Utsav Sampark Setu'
 PWA_APP_DESCRIPTION = "Utsav Sampark Setu"
 PWA_APP_START_URL = '/admin'
+# INSTALLED_APPS += ["django_extensions"]
