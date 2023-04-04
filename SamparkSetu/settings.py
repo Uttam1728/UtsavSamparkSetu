@@ -28,7 +28,7 @@ DEBUG = True
 MEDIA_URL = '/Photos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "Photos")
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com', 'drive.google.com', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['utsav-sampark-setu.onrender.com', 'drive.google.com', '127.0.0.1', '0.0.0.0']
 
 # Application definition
 
