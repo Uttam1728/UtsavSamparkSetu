@@ -76,7 +76,7 @@ class YuvakProfile(models.Model):
         # Choices is a list of Tuple
     )
     ProfilePhoto = models.ImageField(
-        upload_to='media/', blank=True, null=True)
+        upload_to='media/yuvak', blank=True, null=True)
     Email = models.EmailField(default="yuvak@utsavmandal.com")
 
     def get_absolute_url(self):

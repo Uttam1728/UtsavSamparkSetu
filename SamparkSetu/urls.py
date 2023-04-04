@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf import settings
-from django.conf.urls import url
+# from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import redirect
@@ -31,7 +31,7 @@ urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('mark_present', Followup_view.mark_attandance),
                   path('qr_scan', Followup_view.qr_scan),
-                  url(r'^advanced_filters/', include('advanced_filters.urls')),
+                  path(r'advanced_filters/', include('advanced_filters.urls')),
                   path('', include('pwa.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

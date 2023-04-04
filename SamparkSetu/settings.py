@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 
-import django_heroku
+# import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +28,7 @@ DEBUG = True
 MEDIA_URL = '/Photos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "Photos")
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com', 'drive.google.com']
+ALLOWED_HOSTS = ['utsav-sampark-setu.herokuapp.com', 'drive.google.com', '127.0.0.1', '0.0.0.0']
 
 # Application definition
 
@@ -108,7 +108,7 @@ DATABASES = {
 
         'PASSWORD': '7LTgEdab3rj0ncIPFv5lxKMQnTBWdwMh',
 
-        'HOST': 'dpg-cgleo74eoogkndg6ridg-a',
+        'HOST': 'dpg-cgleo74eoogkndg6ridg-a.oregon-postgres.render.com',
 
         'PORT': '5432',
     }
@@ -141,7 +141,7 @@ USE_TZ = False
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
