@@ -35,6 +35,8 @@ ALLOWED_HOSTS = ['utsav-sampark-setu.onrender.com', 'drive.google.com', '127.0.0
 INSTALLED_APPS = [
 
     'rangefilter',
+    'admin_interface',
+    'colorfield',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -173,3 +175,5 @@ PWA_APP_NAME = 'Utsav Sampark Setu'
 PWA_APP_DESCRIPTION = "Utsav Sampark Setu"
 PWA_APP_START_URL = '/admin'
 # INSTALLED_APPS += ["django_extensions"]
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
