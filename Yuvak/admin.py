@@ -56,6 +56,11 @@ def YUvakProfileSupport(sender, instance, **kwargs):
 # Register your models here.
 
 
+class SatsangProfileInline(admin.StackedInline):
+    model = SatsangProfile
+    can_delete = False
+
+
 class RoleFilter(admin.SimpleListFilter):
     title = 'Role'
     parameter_name = 'role'
@@ -171,6 +176,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
                  ("Address", {"fields": ("HouseNo", "Soc_Name", "LandMark", "Area", "PinCode",)}),
                  ("Seva Intrets", {"fields": ("Seva_Intrests", "mandal")}),
                  )
+    inlines = [SatsangProfileInline]
 
     @admin.action(description='Create Excel')
     def create_excel(modeladmin, request, queryset):
