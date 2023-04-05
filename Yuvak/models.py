@@ -60,7 +60,7 @@ class YuvakProfile(models.Model):
     WhatsappNo = models.CharField(max_length=10, db_index=True)
     HomePhoneNo = models.CharField(max_length=10, null=True, blank=True)
     HouseNo = models.IntegerField(verbose_name="House/Flat No.", null=True, blank=True)
-    Soc_Name = models.CharField(max_length=50, verbose_name="Sociaty/Apartment Name", null=True, blank=True)
+    Soc_Name = models.CharField(max_length=500, verbose_name="Sociaty/Apartment Name", null=True, blank=True)
     LandMark = models.CharField(max_length=100, null=True, blank=True)
     Area = models.CharField(max_length=50, null=True, blank=True)
     PinCode = models.CharField(max_length=6, null=True, blank=True)
