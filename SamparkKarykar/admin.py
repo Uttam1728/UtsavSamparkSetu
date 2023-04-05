@@ -144,6 +144,11 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
             return ["Yuvaks", "karykar1profile", "karykar2profile", "mandal"]
         return super().get_readonly_fields(request, obj)
 
+    def get_list_filter(self, request):
+        if not request.user.is_superuser:
+            return []
+        return super().get_list_filter(request)
+
 
 # Register your models here.
 admin.site.register(KaryakarProfile, KaryakarProfileAdmin)
