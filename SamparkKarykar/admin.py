@@ -12,13 +12,17 @@ from SamparkKarykar.models import KaryakarProfile
 
 @receiver(post_save, sender=KaryakarProfile)
 def Add_KaryKarGroup(sender, instance, **kwargs):
+    print("in")
     if instance.karykar1profile:
+        print(instance.karykar1profile)
         user = instance.karykar1profile.user
+        print(instance)
         if not user.groups.filter(name="Sampark Karykar").exists():
             group = Group.objects.get(name='Sampark Karykar')
             user.groups.add(group)
     if instance.karykar2profile:
         user = instance.karykar2profile.user
+        print(instance.karykar2profile)
         if not user.groups.filter(name="Sampark Karykar").exists():
             group = Group.objects.get(name='Sampark Karykar')
             user.groups.add(group)
@@ -26,7 +30,7 @@ def Add_KaryKarGroup(sender, instance, **kwargs):
 
 class KaryakarProfileAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/karykar_change_list.html'
-    list_display = ("__str__", "Karykar_1_image", "Karykar_1", "Karykar_2_image", "Karykar_2", "Yuvak_List")
+    list_display = ("group_number", "Karykar_1_image", "Karykar_1", "Karykar_2_image", "Karykar_2", "Yuvak_List")
     list_per_page = 20
     autocomplete_fields = ('karykar1profile', 'karykar2profile', 'Yuvaks')
     search_fields = ('karykar1profile__FirstName__icontains',
@@ -35,6 +39,7 @@ class KaryakarProfileAdmin(admin.ModelAdmin):
                      'karykar2profile__SurName__icontains',
                      'Yuvaks__FirstName__icontains',
                      'Yuvaks__SurName__icontains')
+    list_filter = ('group_number',)
     actions = ['create_excel', ]
 
     @admin.action(description='Create Excel')

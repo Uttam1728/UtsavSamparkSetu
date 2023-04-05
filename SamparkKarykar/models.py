@@ -1,6 +1,7 @@
 from django.db import models
 
 from Mandal.models import MandalProfile
+from SamparkKarykar.constant import Alphabet
 from Yuvak.models import YuvakProfile
 
 
@@ -10,6 +11,11 @@ class KaryakarProfile(models.Model):
                                            related_name="Profile2Info")
     Yuvaks = models.ManyToManyField(YuvakProfile, blank=True, )
     mandal = models.ForeignKey(MandalProfile, on_delete=models.CASCADE)
+    group_number = models.IntegerField()
+    group_number = models.IntegerField(
+        blank=True, null=True,
+        choices=[(alphabet.value, alphabet.name) for alphabet in Alphabet]  # Choices is a list of Tuple
+    )
 
     def __str__(self):
         return "Vrund No : " + str(self.pk)
