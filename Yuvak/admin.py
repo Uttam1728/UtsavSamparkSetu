@@ -150,7 +150,8 @@ class YuvakProfileForm(forms.ModelForm):
 class YuvakProfileAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/yuvak_change_list.html'
     form = YuvakProfileForm
-    list_display = ("yuvakimage", "Yuvak", "Profile_Completion", "WhatsApp", "Call", "SMS", "userLink", "Role")
+    list_display = (
+    "yuvakimage", "Yuvak", "Profile_Completion", 'Whatsapp_user', "WhatsApp", "Call", "SMS", "userLink", "Role")
     list_per_page = 20
     list_filter = [RoleFilter, ("DateOfBirth", DateRangeFilter), KaryKarAlloatMentFilter, ProgresBarFilter,
                    ('Education', MultiSelectDropdownFilter), 'current_Education',
@@ -198,6 +199,15 @@ class YuvakProfileAdmin(admin.ModelAdmin):
         if not request.user.is_superuser:
             return dict()
         return actions
+
+    def Whatsapp_user(self, obj):
+        buttons = ''
+        buttons += "<a href='https://wa.me/+91{mo_no}?text=Your username is - {user_name} and password - 1234' target='_blank'> Send UserName </a>".format(
+            mo_no=obj.WhatsappNo, user_name=obj.user)
+        return format_html(buttons)
+
+    Whatsapp_user.short_description = " "
+    Whatsapp_user.admin_order_field = 'Send User'
 
     # specify which fields can be selected in the advanced filter
     # creation form
