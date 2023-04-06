@@ -21,7 +21,6 @@ from rangefilter.filter import DateRangeFilter
 
 from Common.util import Profile_Completion, getMandal, is_member, create_Excel_queryset, messageIcons
 from FolloWUp.models import FollowUp
-from Mandal.admin import adminVrund
 from Mandal.models import Karyakram
 from Yuvak.models import SatsangProfile, YuvakProfile, SevaVibhag
 
@@ -48,9 +47,10 @@ def YUvakProfileSupport(sender, instance, **kwargs):
     qs = Karyakram.objects.filter(Start_Folloup=True, IsDone=False)
     if qs.exists():
         if not FollowUp.objects.filter(Karyakram=qs.first(), Yuvak=instance).exists():
-            FollowUp.objects.get_or_create(Karyakram=qs.first(),
-                                           KaryKarVrund=adminVrund(instance.mandal),
-                                           Yuvak=instance)
+            # FollowUp.objects.get_or_create(Karyakram=qs.first(),
+            #                                KaryKarVrund=adminVrund(instance.mandal),
+            #                                Yuvak=instance)
+            pass
 
 
 # Register your models here.
@@ -151,7 +151,7 @@ class YuvakProfileAdmin(admin.ModelAdmin):
     # change_list_template = 'admin/yuvak_change_list.html'
     form = YuvakProfileForm
     list_display = (
-    "yuvakimage", "Yuvak", "Profile_Completion", 'Whatsapp_user', "WhatsApp", "Call", "SMS", "userLink", "Role")
+        "yuvakimage", "Yuvak", "Profile_Completion", 'Whatsapp_user', "WhatsApp", "Call", "SMS", "userLink", "Role")
     list_per_page = 20
     list_filter = [RoleFilter, ("DateOfBirth", DateRangeFilter), KaryKarAlloatMentFilter, ProgresBarFilter,
                    ('Education', MultiSelectDropdownFilter), 'current_Education',
